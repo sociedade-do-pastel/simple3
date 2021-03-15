@@ -5,24 +5,31 @@
 
 tokens = {
     # keywords
-    "dcl" : "keyword",          # def (declare)
-    "ifi" : "keyword",          # if
-    "els" : "keyword",          # else
-    "elf" : "keyword",          # elif
-    "whl" : "keyword",          # while
-    "for" : "keyword",          # for
-    "str" : "keyword",          # str
-    "num" : "keyword",          # numeric type (int, float, double)
-    "tru" : "keyword",          # True
-    "fls" : "keyword",          # False
-    "emp" : "keyword",          # None, nil, null, similares
-    "brk" : "keyword",          # break
-    "jmp" : "keyword",          # jump
-    "ret" : "keyword",          # return
-    "vec" : "keyword",          # vector "vec\<(num|str)\>"                       
+    "dcl" : "keyword",              # def (declare)
+    "tof" : "keyword",              # boolean, true or false
+    "ifi" : "keyword",              # if
+    "els" : "keyword",              # else
+    "elf" : "keyword",              # elif
+    "whl" : "keyword",              # while
+    "for" : "keyword",              # for
+    "str" : "type",                 # str
+    "num" : "type",                 # numeric type (int, float, double)
+    "emp" : "keyword",              # None, nil, null, similares
+    "brk" : "keyword",              # break
+    "jmp" : "keyword",              # continue
+    "ret" : "keyword",              # return
+    "vec\<(num|str)\>" : "keyword", # vector "vec\<(num|str)\>"                       
     # identifiers
-    "[A-z]{3}" : "var",         # 3 caracteres max, entre A-z
-    "" : "func",                    
+    "[A-z]{3}" : "var",             # 3 caracteres max, entre A-z
+    "[0-9]+(\.[0-9]+)?" : "num",
+    "([A-z]{3}|[0-9]+(\.[0-9]+)?){1} [A-z]{3}\((((([A-z]{3}|[0-9]+(\.[0-9]+)?){1} [A-z]{3}),[ ]*)*(([A-z]{3}|[0-9]+(\.[0-9]+)?){1} [A-z]{3}){1})?\)" : "func", 
+    "\"[^\"]*\"" : "str",
+    "^(\/3).*(\n)$" : "comment",
+    "\{" : "scope_init",
+    "\}" : "scope_end",
+    "tru" : "booleanT",             # True
+    "fls" : "booleanF",             # False
+    ";" : "eos",                    # end of statement
     # operator    
     "\+"  : "+",
     "\-"  : "-",
@@ -35,5 +42,8 @@ tokens = {
     "\<\=" : "<=",
     "\="  : "=",
     "\=\=" : "==",
-    "\!"  : "!"
+    "\!"  : "!",
+    "orr" : "or",
+    "and" : "and"
 }
+
