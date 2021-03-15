@@ -14,14 +14,14 @@ tokens = {
     """
         Palavra-chave que representa o início de um controle de fluxo do tipo if
         Utilização:
-            if tst == fls {...
+            ifi tst == fls {...
     """
     "ifi" : "keyword",
     
     """
         Palavra-chave que representa o início de um controle de fluxo do tipo else
         Utilização:
-            else {...
+            els {...
     """
     "els" : "keyword",
 
@@ -144,7 +144,7 @@ tokens = {
         elevado a um número y (num)
 	Utilização:
 		 4^4
-		   --> 64
+		   --> 256
     """
     "\^"  : "^",
     """
