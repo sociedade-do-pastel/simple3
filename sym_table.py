@@ -21,6 +21,17 @@ class SymbolsTable():
         return self._table.copy()
 
     def insert(self, name, type, scope):
+        """Insere ou atualiza um símbolo na tabela.
+
+        Argumentos:
+        name  -- nome do símbolo e também sua chave na tabela
+        type  -- tipo do símbolo
+        scope -- escopo no qual o símbolo pertence
+
+        Retorno:
+        Conteúdo da linha do elemento inserido.
+        """
+        
         name_exists = self._table.get(name)
 
         if name_exists:
