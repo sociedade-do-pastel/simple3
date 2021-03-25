@@ -5,9 +5,19 @@
 
 class SymbolsTable():
     def __init__(self):
+        """
+            Quando a classe SymbolsTable for instanciada, 
+            será criado um dicionário vazio chamado 'table' 
+            para armazenar as variáveis.
+        """
         self._table = dict()
     
     def get_table(self):
+        """
+            O método 'get_table()',
+            retorna uma cópia do dicionário 'table' contendo o nome das variáveis e seus respectivos tipos e scopos.
+            Caso não encontre o dicionário, será retornado None.
+        """
         return self._table.copy()
 
     def insert(self, name, type, scope):
