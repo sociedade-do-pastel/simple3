@@ -22,4 +22,14 @@ class SymbolsTable():
         return self._table
 
     def lookup(self, name):
+        """Método de lookup (busca) para os símbolos da tabela,
+        este utilizando-se do método nativo de dicionários get().
+
+        Argumentos:
+        name -- "Nome" do símbolo a ser procurado
+        
+        Retorno:
+        Valor do símbolo a ser encontrado ou None
+
+        """
         return self._table.get(name)
