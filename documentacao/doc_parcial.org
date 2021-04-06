@@ -1,0 +1,63 @@
+#+title: A linguagem de programação Simple3
+#+options: date:nil author:nil toc:nil
+#+latex_header: \usepackage{indentfirst}
+#+latex_header: \usepackage[margin=2cm]{geometry}
+#+latex_header: \usepackage[utf8]{inputenc}
+#+latex_header: \usepackage[brazilian]{babel}
+#+latex_header: \author{{Bellini, Leon F.}\\{\small 22218002-8} \and {Sampaio, Guilherme O.}\\{\small 22218007-7} \and {Barbosa, Pedro F. M.}\\{\small 22218013-5} \and {de Sousa, Felipe M.}\\{\small 22218042-4}}
+
+* Introdução
+Fanáticos por minimalismo e simplicidade cravam por uma linguagem desenvolvida
+como a *Simple3*, na qual o limite de três caracteres em todas as palavras-chave
+permite a criação de arquivos fonte com menores dimensões em questões de espaço
+em disco utilizado. Vide a seção [[* Utilização do compilador]] para as instruções
+de como programar e compilar um arquivo fonte da *Simple3*. 
+
+* Tokens e suas expressões regulares
+A seguir encontram-se relações de todos *tokens* presentes na linguagem, bem como
+as expressões regulares relacionadas à captura destes. Para maior informação
+quanto à utilização e significado de cada *token*, basta ler o conteúdo presente
+no arquivo =tokens.py= como mostrado no exemplo abaixo:
+
+#+begin_src sh
+less tokens.py 
+#+end_src
+
+** Operadores
+
+| Operador   | Descrição |
+|------------+-----------|
+| \(+\)      |           |
+| \(-\)      |           |
+| \(*\)      |           |
+| \(/\)      |           |
+| \(\hat{}\) |           |
+| \(>\)      |           |
+| \(<\)      |           |
+| \(>=\)     |           |
+| \(<=\)     |           |
+| \(=\)      |           |
+| \(==\)     |           |
+| \(!\)      |           |
+| =orr=        |           |
+| =and=        |           |
+|------------+-----------|
+
+
+* Utilização do compilador
+Basta invocar o arquivo principal =comple.py= localizado na pasta raiz do
+projeto juntamente com a versão mais recente de *Python 3*. No caso, esta seria,
+também, a única dependência explicita do projeto. A sintaxe de uma compilação
+comum dá se por:
+
+#+begin_src sh
+  python comple.py alvo.sp3
+#+end_src
+
+Note que a extensão do arquivo deve conter, necessariamente, o sufixo =.sp3=. Qualquer outro
+arquivo será negado pelo compilador. O executável de saída após a compilação tem
+o nome fixo =output.py=. 
+
+** Arquivo fonte
+#+include: ./arquivo_teste.sp3 example
+
