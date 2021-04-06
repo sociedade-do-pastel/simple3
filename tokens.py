@@ -94,7 +94,7 @@ tokens = {
     # Regex para definição de funções
     # Assinatura:
     #     tipo nome_da_funcao(tipo parametro, ...)
-    "([A-z]{3}|[0-9]+(\.[0-9]+)?){1} [A-z]{3}\((((([A-z]{3}|[0-9]+(\.[0-9]+)?){1} [A-z]{3}),[ ]*)*(([A-z]{3}|[0-9]+(\.[0-9]+)?){1} [A-z]{3}){1})?\)": "func",
+    "(num|str|emp) [A-z]{3}\(((num|str) [A-z]{3}, *)*(((num|str) [A-z]{3}){1})?\)": "func",
 
     # Identificador de vazio
     # Utilizado para verificar a inexistência de valor ou tamanho
