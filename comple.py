@@ -17,11 +17,17 @@ from simple_exceptions import exceptions
 
 
 def GetAsList(filename):
+    """
+    Retorna o arquivo lido como uma lista sem caracteres de nova linha
+    """
     with open(filename, "r") as arquivo:
         return [linhas.strip("\n") for linhas in arquivo.readlines()]
 
 
 def GetAsString(filename):
+    """
+    Retorna o arquivo lido como uma string completa
+    """
     with open(filename, "r") as arquivo:
         return arquivo.read().strip("\n")
 
@@ -33,7 +39,7 @@ def FileReader(filename, listar=False):
     porem, no caso da lista, e possivel determinar o numero da linha
     que um erro tenha ocorrido utilizando-se do indice da lista+1.
     """
-    if filename.split(".")[1] == ".sp3":
+    if filename.split(".")[1] != ".sp3":
         raise exceptions.ArquivoNaoPadronizado
     else:
         if listar:
