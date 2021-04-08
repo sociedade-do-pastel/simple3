@@ -76,7 +76,7 @@ tokens = {
     # Palavra-chave que representa a declaração de um vetor
     # Utilização:
     #     vec<num> tst = [1, 3.14, 22];
-    "vec\<(num|str)\>": "keyword",
+    "vec\\<(num|str)\\>": "keyword",
 
     # identifiers
 
@@ -89,12 +89,12 @@ tokens = {
 
     # Regex para definição do tipo num
     # Tipo genérico para qualquer numeral, incluindo int, float e double
-    "[0-9]+(\.[0-9]+)?": "num",
+    "[0-9]+(\\.[0-9]+)?": "num",
 
     # Regex para definição de funções
     # Assinatura:
     #     tipo nome_da_funcao(tipo parametro, ...)
-    "(num|str|emp) [A-z]{3}\(((num|str) [A-z]{3}, *)*(((num|str) [A-z]{3}){1})?\)": "func",
+    "(num|str|emp) [A-z]{3}\\(((num|str) [A-z]{3}, *)*(((num|str) [A-z]{3}){1})?\\)": "func",
 
     # Identificador de vazio
     # Utilizado para verificar a inexistência de valor ou tamanho
@@ -109,7 +109,7 @@ tokens = {
     #     /3...\n
     # Observações:
     #     Há somente comentários de linha completa
-    "^(\/3).*(\n)$": "comment",
+    "^(\\/3).*(\n)$": "comment",
 
     # Identificador de início de escopo
     # Assinatura:
@@ -138,32 +138,32 @@ tokens = {
     # Utilização:
     #          4 + 4
     #            --> 8
-    "\+": "+",
+    "\\+": "+",
 
     # Operador binário para subtração algébrica entre dois números (num)
     # Utilização:
     #          4 - 4
     #            --> 0
-    "\-": "-",
+    "\\-": "-",
 
     # Operador binário para multiplicação algébrica entre dois números (num)
     # Utilização:
     #          4 * 4
     #            --> 16
-    "\*": "*",
+    "\\*": "*",
 
     # Operador binário para divisão algébrica entre dois números (num)
     # Utilização:
     #          4 / 4
     #            --> 1
-    "\/": "/",
+    "\\/": "/",
 
     # Operador binário para exponenciação de um número qualquer x (num)
     # elevado a um número y (num)
     # Utilização:
     #          4^4
     #            --> 256
-    "\^": "^",
+    "\\^": "^",
 
     # Operador binário para comparação entre dois operandos
     # (esquerdo e direito), retorna tru se
@@ -172,7 +172,7 @@ tokens = {
     # Utilização:
     #          4 > 3
     #            --> tru
-    "\>": ">",
+    "\\>": ">",
 
     # Operador binário para comparação entre dois operandos
     # (esquerdo e direito), retorna tru se
@@ -181,7 +181,7 @@ tokens = {
     # Utilização:
     #          4 >= 3
     #            --> tru
-    "\>\=": ">=",
+    "\\>\\=": ">=",
 
     # Operador binário para comparação entre dois operandos
     # (esquerdo e direito), retorna tru se
@@ -189,7 +189,7 @@ tokens = {
     # Utilização:
     #          4 < 3
     #            --> fls
-    "\<": "<",
+    "\\<": "<",
 
     # Operador binário para comparação entre dois operandos
     # (esquerdo e direito), retorna tru se
@@ -197,14 +197,14 @@ tokens = {
     # fls caso contrário:
     #          4 <= 3
     #            --> fls
-    "\<\=": "<=",
+    "\\<\\=": "<=",
 
     # Operador binário para atribuição de um valor numérico (num),
     # string (str), nulo (emp) ou booleano (tof)
     # à uma variável nomeada
     # Utilização:
     #       num jaj = 4
-    "\=": "=",
+    "\\=": "=",
 
     # Operador binário para comparação de igualdade entre dois operandos
     # (esquerdo e direito),
@@ -213,14 +213,14 @@ tokens = {
     # Utilização:
     #         4 == 4
     #           --> tru
-    "\=\=": "==",
+    "\\=\\=": "==",
 
     # Operador unário booleano/buliano para a negação do valor de uma
     # variável ou operando booleano (tof)
     # Utilização:
     #          !tru
     #                 --> fls
-    "\!": "!",
+    "\\!": "!",
 
     # Operador binário booleano *ou*. Retorna tru caso um dos operandos
     # resultem em valores tru, fls caso contrário
