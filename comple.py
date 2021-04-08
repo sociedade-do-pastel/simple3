@@ -44,8 +44,7 @@ def FileReader(filename, listar=False):
     else:
         if listar:
             return GetAsList(filename)
-        else:
-            return GetAsString(filename)
+        return GetAsString(filename)
 
 
 def main(argv):
@@ -54,18 +53,18 @@ def main(argv):
     if len(argv) < 2:
         print("Necessario um arquivo fonte da linguagem", file=sys.stderr)
         exit(1)  # se o usuario nao inseriu um arquivo fonte
-    else:
-        arquivo_raw = argv[1]
-        try:
-            alvo_comp = FileReader(arquivo_raw, True)
-            print(alvo_comp)
-        except exceptions.ArquivoNaoPadronizado as ExcObj:
-            print(ExcObj, file=sys.stderr)
-        except FileNotFoundError as FileError:
-            print(f'{arquivo_raw} no encontrado: {FileError}', file=sys.stderr)
-        except IndexError as Indice:
-            print(f'Argumentos faltantes, inserir nome do arquivo\n\n{Indice}', file=sys.stderr)
-        # quando ocorrido algum erro na etapa de análise léxica
+
+    arquivo_raw = argv[1]
+    try:
+        alvo_comp = FileReader(arquivo_raw, True)
+        print(alvo_comp)
+    except exceptions.ArquivoNaoPadronizado as ExcObj:
+        print(ExcObj, file=sys.stderr)
+    except FileNotFoundError as FileError:
+        print(f'{arquivo_raw} no encontrado: {FileError}', file=sys.stderr)
+    except IndexError as Indice:
+        print(f'Argumentos faltantes, inserir nome do arquivo\n\n{Indice}', file=sys.stderr)
+    # quando ocorrido algum erro na etapa de análise léxica
     try:
         # TODO realizar aqui processo de analise lexica
         # lexer(alvo_comp)
