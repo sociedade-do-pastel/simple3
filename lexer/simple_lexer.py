@@ -10,13 +10,14 @@ class simple_lexer:
 
     (estao livres para modificar este comportamento)
     '''
+
     def __init__(self, linhas_p_tratar):
         self.linhas = linhas_p_tratar
         self.tokens_reconhecidos = []
 
     def analiseLexica(self):
         if self.listaP():
-            linhas_an = [self.reconhecerT(linh) for linh in self.linhas]
+            linhas_an = [self.reconhecer(linh) for linh in self.linhas]
         else:
             pass  # TODO reconhecer unica string
         self.tokens_reconhecidos = linhas_an
