@@ -96,6 +96,10 @@ tokens = {
     #     tipo nome_da_funcao(tipo parametro, ...)
     "(num|str|emp) [A-z]{3}\\(((num|str) [A-z]{3}, *)*(((num|str) [A-z]{3}){1})?\\)": "func",
 
+    # Regex para chamada de funções
+    # nome_da_funcao(argumento1, argumento2 ..., argumenton)
+    "[A-z]{3}\\((.*, *)*((.*){1})?\\)": "func_call",
+
     # Identificador de vazio
     # Utilizado para verificar a inexistência de valor ou tamanho
     "emp": "emp",
@@ -114,12 +118,12 @@ tokens = {
     # Identificador de início de escopo
     # Assinatura:
     #     {...
-    "\{": "scope_init",
+    "{": "scope_init",
 
     # Identificador de fim de escopo
     # Assinatura:
     #     ...}
-    "\}": "scope_end",
+    "}": "scope_end",
 
     # Identificador do tipo booleano tru (true)
     "tru": "booleanT",
@@ -138,32 +142,32 @@ tokens = {
     # Utilização:
     #          4 + 4
     #            --> 8
-    "\\+": "+",
+    "\\+": "operator",
 
     # Operador binário para subtração algébrica entre dois números (num)
     # Utilização:
     #          4 - 4
     #            --> 0
-    "\\-": "-",
+    "\\-": "operator",
 
     # Operador binário para multiplicação algébrica entre dois números (num)
     # Utilização:
     #          4 * 4
     #            --> 16
-    "\\*": "*",
+    "\\*": "operator",
 
     # Operador binário para divisão algébrica entre dois números (num)
     # Utilização:
     #          4 / 4
     #            --> 1
-    "\\/": "/",
+    "\\/": "operator",
 
     # Operador binário para exponenciação de um número qualquer x (num)
     # elevado a um número y (num)
     # Utilização:
     #          4^4
     #            --> 256
-    "\\^": "^",
+    "\\^": "operator",
 
     # Operador binário para comparação entre dois operandos
     # (esquerdo e direito), retorna tru se
@@ -172,7 +176,7 @@ tokens = {
     # Utilização:
     #          4 > 3
     #            --> tru
-    "\\>": ">",
+    "\\>": "operator",
 
     # Operador binário para comparação entre dois operandos
     # (esquerdo e direito), retorna tru se
@@ -181,7 +185,7 @@ tokens = {
     # Utilização:
     #          4 >= 3
     #            --> tru
-    "\\>\\=": ">=",
+    "\\>\\=": "operator",
 
     # Operador binário para comparação entre dois operandos
     # (esquerdo e direito), retorna tru se
@@ -189,7 +193,7 @@ tokens = {
     # Utilização:
     #          4 < 3
     #            --> fls
-    "\\<": "<",
+    "\\<": "operator",
 
     # Operador binário para comparação entre dois operandos
     # (esquerdo e direito), retorna tru se
@@ -197,14 +201,14 @@ tokens = {
     # fls caso contrário:
     #          4 <= 3
     #            --> fls
-    "\\<\\=": "<=",
+    "\\<\\=": "operator",
 
     # Operador binário para atribuição de um valor numérico (num),
     # string (str), nulo (emp) ou booleano (tof)
     # à uma variável nomeada
     # Utilização:
     #       num jaj = 4
-    "\\=": "=",
+    "\\=": "operator",
 
     # Operador binário para comparação de igualdade entre dois operandos
     # (esquerdo e direito),
@@ -213,26 +217,33 @@ tokens = {
     # Utilização:
     #         4 == 4
     #           --> tru
-    "\\=\\=": "==",
+    "\\=\\=": "operator",
 
     # Operador unário booleano/buliano para a negação do valor de uma
     # variável ou operando booleano (tof)
     # Utilização:
     #          !tru
     #                 --> fls
-    "\\!": "!",
+    "\\!": "operator",
 
     # Operador binário booleano *ou*. Retorna tru caso um dos operandos
     # resultem em valores tru, fls caso contrário
     # Utilização:
     #          tru orr fls
     #              --> tru
-    "orr": "or",
+    "orr": "operator",
 
     # Operador binário booleano *e*. Retorna tru caso ambos resultem em
     # valores tru, fls caso contrário
     # Utilização:
     #          tru and fls
     #              --> fls
-    "and": "and"
+    "and": "operator",
+
+    # Operador binário para definicao de ranges. Recebe dois *num* e define
+    # um range
+    # Utilização:
+    #          0:1
+    #           --> range de zero a um
+    ":": "operator"
 }
