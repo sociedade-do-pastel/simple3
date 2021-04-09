@@ -1,3 +1,41 @@
+reservados = {
+    "ifi": ("ifi", "ifi"),
+    "elf": ("elf", "elf"),
+    "els": ("els", "els"),
+    "emp": ("emp", "emp"),
+    "tof": ("tof", "tof"),
+    "whl": ("whl", "whl"),
+    "brk": ("brk", "brk"),
+    "for": ("for", "for"),
+    "jmp": ("jmp", "jmp"),
+    "ret": ("ret", "ret"),
+    "tru": ("tru", "tru"),
+    "fls": ("fls", "fls"),
+    "orr": ("operator", "orr"),
+    "and": ("operator", "and"),
+    "{": ("scope_init", "{"),
+    "}": ("scope_end", "}"),
+    "(": ("(", "("),
+    ")": (")", ")"),
+    "[": ("[", "["),
+    "]": ("]", "]"),
+    ";": ("eos", ";"),
+    "+": ("operator", "+"),
+    "-": ("operator", "-"),
+    "*": ("operator", "*"),
+    "/": ("operator", "/"),
+    "^": ("operator", "^"),
+    "<": ("operator", "<"),
+    ">": ("operator", ">"),
+    "<=": ("operator", "<="),
+    ">=": ("operator", ">="),
+    "=": ("operator", "="),
+    "==": ("operator", "=="),
+    "!": ("operator", "!"),
+    ":": (":", ":")
+}
+
+
 def afd_num(lex):
     """
     Função que verifica um num através de seu autômato
@@ -71,35 +109,6 @@ def afd_var(lex):
         return ('var', lex)
 
 
-def afd_emp(lex):
-    """
-    Função que verifica um emp através de seu autômato
-
-    Argumentos:
-        lex - Lexema a ser testado
-
-    Retorno:
-        - Sucesso: ('emp', 'emp')
-        - Falha: None
-    """
-    afd = {
-        0: {'e': 1},
-        1: {'m': 2},
-        2: {'p': 3},
-        3: {}
-    }
-    final_states = [3]
-    current_state = 0
-
-    for word in str(lex):
-        current_state = afd[current_state].get(word)
-        if current_state is None:
-            return None
-
-    if current_state in final_states:
-        return ('emp', lex)
-
-
 def afd_str(lex):
     """
     Função que verifica uma string através de seu autômato
@@ -131,71 +140,6 @@ def afd_str(lex):
         return ('str', lex)
 
 
-def afd_keyword(lex):
-    """
-    Função que verifica uma keyword através de seu autômato
-
-    Argumentos:
-        lex - Lexema a ser testado
-
-    Retorno:
-        - Sucesso: ('keyword', lex)
-        - Falha: None
-    """
-    afd = {
-        0: {
-            'b': 1, 'e': 2, 'f': 3, 'i': 4, 'j': 5, 'r': 6, 't': 7, 'v': 8, 'w': 9
-        },
-        1: {'r': 10},
-        2: {'l': 11},
-        3: {'o': 12},
-        4: {'f': 13},
-        5: {'m': 14},
-        6: {'e': 15},
-        7: {'o': 16},
-        8: {'e': 17},
-        9: {'h': 18},
-        10: {'k': 19},
-        11: {'f': 20, 's': 21},
-        12: {'r': 22},
-        13: {'i': 23},
-        14: {'p': 24},
-        15: {'t': 25},
-        16: {'f': 26},
-        17: {'c': 27},
-        18: {'l': 28},
-        19: {},
-        20: {},
-        21: {},
-        22: {},
-        23: {},
-        24: {},
-        25: {},
-        26: {},
-        27: {'<': 29},
-        28: {},
-        29: {'n': 30, 's': 31},
-        30: {'u': 32},
-        31: {'t': 33},
-        32: {'m': 34},
-        33: {'r': 35},
-        34: {'>': 36},
-        35: {'>': 37},
-        36: {},
-        37: {}
-    }
-    final_states = [19, 20, 21, 22, 23, 24, 25, 26, 28, 36, 37]
-    current_state = 0
-
-    for word in str(lex):
-        current_state = afd[current_state].get(word)
-        if current_state is None:
-            return None
-
-    if current_state in final_states:
-        return ('keyword', lex)
-
-
 def categorizar_lex(lex):
     #  uma grande cadeia de ifs,
     #  as prioridades de token sao definidas pela ordem de tais condicionais
@@ -214,4 +158,28 @@ def categorizar_lex(lex):
     # TODO
     # operators
     # TODO
-    pass
+
+    # # FAZER O AFD DE COMENTÁRIO AAAAAAAAAAAAAAAAAAAAAAAAAA
+    # A
+    # A
+    # A
+    # AA
+    # A
+    # A
+    # A
+    # A
+    # A
+
+    if len(lex) == 3 and lex not in reservados:
+        result = afd_var(lex)
+
+    if lex.isdigit():
+        result = afd_num(lex)
+
+    if lex[0] == '"':
+        result = afd_str(lex)
+
+    if lex in reservados:
+        result = reservados.get(lex)
+
+    return result if result is not None else None
