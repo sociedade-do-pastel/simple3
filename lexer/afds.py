@@ -197,10 +197,10 @@ def afd_keyword(lex):
 
 
 def categorizar_lex(lex):
-    #  uma grande cadeia de ifs,
-    #  as prioridades de token sao definidas pela ordem de tais condicionais
-    # var nao pode conter numeros, checado primeiro num e nao
-    # obtemos conflitos. Talvez seja necessario contruir um afd geral?
+    # uma grande cadeia de condicionais,
+    # as prioridades de token sao definidas pela ordem de tais condicionais
+    # var nao pode conter numeros, checado primeiro num e nao obtemos conflitos.
+    # Talvez seja necessario contruir um afd geral?
     # tipos
     # numeric
     # TODO
