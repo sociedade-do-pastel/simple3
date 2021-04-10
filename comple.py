@@ -12,7 +12,7 @@ import sys
 # imports das classes do grupo
 from simple_exceptions import exceptions
 # aqui virao os analisadores lexico e sintatico
-# from lexer import lexer   # ou algo assim
+from lexer.simple_lexer import simple_lexer
 # from parser import parser # same as before
 
 
@@ -21,31 +21,19 @@ def GetAsList(filename):
     Retorna o arquivo lido como uma lista sem caracteres de nova linha
     """
     with open(filename, "r") as arquivo:
-        return [linhas.strip("\n") for linhas in arquivo.readlines()]
-
-
-def GetAsString(filename):
-    """
-    Retorna o arquivo lido como uma string completa
-    """
-    with open(filename, "r") as arquivo:
-        return arquivo.read().strip("\n")
+        return [lin.strip() for lin in arquivo.readlines() if lin != "\n"]
 
 
 def FileReader(filename, listar=False):
     """
-    Retorna uma lista ou string referente a todas as linhas do arquivo
-    lido. O implementador pode escolher como realizar o processo de parsing,
-    porem, no caso da lista, e possivel determinar o numero da linha
-    que um erro tenha ocorrido utilizando-se do indice da lista+1.
+    Retorna uma lista referente a todas as linhas do arquivo lido. No caso, com
+    uma lista, e possivel determinar o numero da linha que um erro tenha
+    ocorrido utilizando-se do indice da lista+1.
     """
-    if filename.split(".")[1] != ".sp3":
-        raise exceptions.ArquivoNaoPadronizado
-    else:
-        if listar:
-            return GetAsList(filename)
-        else:
-            return GetAsString(filename)
+    if filename.split(".")[1] != "sp3":
+        raise exceptions.ArquivoNaoPadronizado(filename)
+
+    return GetAsList(filename)
 
 
 def main(argv):
@@ -58,23 +46,23 @@ def main(argv):
         arquivo_raw = argv[1]
         try:
             alvo_comp = FileReader(arquivo_raw, True)
-            print(alvo_comp)
         except exceptions.ArquivoNaoPadronizado as ExcObj:
             print(ExcObj, file=sys.stderr)
         except FileNotFoundError as FileError:
             print(f'{arquivo_raw} no encontrado: {FileError}', file=sys.stderr)
         except IndexError as Indice:
-            print(f'Argumentos faltantes, inserir nome do arquivo\n\n{Indice}', file=sys.stderr)
+            print(f'Argumentos faltantes, inserir nome do arquivo\n\n{Indice}',
+                  file=sys.stderr)
         # quando ocorrido algum erro na etapa de análise léxica
     try:
-        # TODO realizar aqui processo de analise lexica
-        # lexer(alvo_comp)
-        pass
+        lexing_object = simple_lexer(alvo_comp)
+        lexing_object.analise_lexica()
     except exceptions.ErroLexer as LexErr:
         print(LexErr, sys.stderr)
     # TODO tratar filenames de saída customizáveis (necessário?)
     # compiledFileSave(filename_to_save)
 
+    print(lexing_object.tokens_reconhecidos)
 
 if __name__ == '__main__':
     main(sys.argv)
