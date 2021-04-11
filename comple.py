@@ -36,8 +36,22 @@ def FileReader(filename, listar=False):
     return GetAsList(filename)
 
 
+def compiledFileSave(filename, target, lex=False):
+    if lex:
+        with open(filename, "w") as arquivo:
+            for num, linhas in enumerate(target.tokens_reconhecidos, 1):
+                arquivo.write(f'Linha: {num} ')
+                for lexemas in linhas:
+                    arquivo.write(f'{str(lexemas)}, ')
+                arquivo.write('\n')
+            arquivo.write('\n'*10)
+            arquivo.write('Tabela de simbolos:\n')
+            for key, value in target.tabela_simb.get_table().items():
+                arquivo.write(f'{key} : {value} \n')
+
+
 def main(argv):
-    filename_to_save = "output.py"
+    filename_to_save = "output.txt"
 
     if len(argv) < 2:
         print("Necessario um arquivo fonte da linguagem", file=sys.stderr)
@@ -60,9 +74,9 @@ def main(argv):
     except exceptions.ErroLexer as LexErr:
         print(LexErr, sys.stderr)
     # TODO tratar filenames de saída customizáveis (necessário?)
-    # compiledFileSave(filename_to_save)
+    compiledFileSave(filename_to_save,
+                     lexing_object, lex=True)
 
-    print(lexing_object.tokens_reconhecidos)
 
 if __name__ == '__main__':
     main(sys.argv)

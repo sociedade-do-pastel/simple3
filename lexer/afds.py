@@ -1,4 +1,8 @@
+escopo = 0
+
 reservados = {
+    "num": ("type", "num"),
+    "str": ("type", "str"),
     "ifi": ("ifi", "ifi"),
     "elf": ("elf", "elf"),
     "els": ("els", "els"),
@@ -36,6 +40,7 @@ reservados = {
 }
 
 
+
 def afd_num(lex):
     """
     Função que verifica um num através de seu autômato
@@ -62,7 +67,7 @@ def afd_num(lex):
             return None
 
     if current_state in final_states:
-        return ('num', lex)
+        return ('num', lex, escopo)
 
 
 def afd_var(lex):
@@ -106,7 +111,7 @@ def afd_var(lex):
             return None
 
     if current_state in final_states:
-        return ('var', lex)
+        return ('var', lex, escopo)
 
 
 def afd_str(lex):
@@ -137,28 +142,14 @@ def afd_str(lex):
                 return None
 
     if current_state in final_states:
-        return ('str', lex)
+        return ('str', lex, escopo)
 
 
 def categorizar_lex(lex):
     # uma grande cadeia de condicionais,
     # as prioridades de token sao definidas pela ordem de tais condicionais
-    # var nao pode conter numeros, checado primeiro num e nao obtemos conflitos.
-    # Talvez seja necessario contruir um afd geral?
-    # tipos
-    # numeric
-    # TODO
-    # string
-    # TODO
-    # empty (nil)
-    # TODO
-    # keywords
-    # TODO
-    # identifiers
-    # TODO
-    # operators
-    # TODO
-
+    # var nao pode conter numeros, checado primeiro num e nao obtemos conflitos
+    global escopo  # mas praticas?
     # # FAZER O AFD DE COMENTÁRIO AAAAAAAAAAAAAAAAAAAAAAAAAA
     # A
     # A
@@ -169,7 +160,6 @@ def categorizar_lex(lex):
     # A
     # A
     # A
-
     if len(lex) == 3 and lex not in reservados:
         result = afd_var(lex)
 
@@ -181,5 +171,11 @@ def categorizar_lex(lex):
 
     if lex in reservados:
         result = reservados.get(lex)
+        if result[0] == "scope_init":
+            escopo += 1
+        elif result[0] == "scope_end":
+            escopo -= 1
+        result = result + (escopo,)
+
 
     return result if result is not None else None
