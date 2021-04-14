@@ -1,5 +1,13 @@
-escopo = 0
+###############################################################################
+# Neste arquivo estao contidos os automatos para definicao/retorno de tokens, #
+# estes reconhecidos ou nao ao final.                                         #
+#                                                                             #
+# A funcao categorizar_lex realiza a tarefa de "encontrar" e priorizar        #
+# certos automatos                                                            #
+###############################################################################
+ESCOPO = 0  # global de escopo modificada por { ou }
 
+# tokens definidos no arquivo token.py
 reservados = {
     "num": ("type", "num"),
     "str": ("type", "str"),
@@ -40,7 +48,6 @@ reservados = {
 }
 
 
-
 def afd_num(lex):
     """
     Função que verifica um num através de seu autômato
@@ -67,7 +74,7 @@ def afd_num(lex):
             return None
 
     if current_state in final_states:
-        return ('num', lex, escopo)
+        return ('num', lex, ESCOPO)
 
 
 def afd_var(lex):
@@ -111,7 +118,7 @@ def afd_var(lex):
             return None
 
     if current_state in final_states:
-        return ('var', lex, escopo)
+        return ('var', lex, ESCOPO)
 
 
 def afd_str(lex):
@@ -142,40 +149,64 @@ def afd_str(lex):
                 return None
 
     if current_state in final_states:
-        return ('str', lex, escopo)
+        return ('str', lex, ESCOPO)
 
 
 def categorizar_lex(lex):
-    # uma grande cadeia de condicionais,
-    # as prioridades de token sao definidas pela ordem de tais condicionais
-    # var nao pode conter numeros, checado primeiro num e nao obtemos conflitos
-    global escopo  # mas praticas?
-    # # FAZER O AFD DE COMENTÁRIO AAAAAAAAAAAAAAAAAAAAAAAAAA
-    # A
-    # A
-    # A
-    # AA
-    # A
-    # A
-    # A
-    # A
-    # A
+    '''
+    Funcao "principal" deste arquivo, a ordem dos condicionais define a
+    prioridade de cada token a ser reconhecido (ex, keywords sobreescrevem
+    resultados anteriores).
+
+    Argumentos:
+       lex - Lexema a ser categorizado
+
+    Retorno:
+       - Sucesso: Um ou mais tokens reconhecidos
+       - Falha:   None
+    '''
+    global ESCOPO  # mas praticas?
+    result = None  # valor padrao
+
     if len(lex) == 3 and lex not in reservados:
-        result = afd_var(lex)
+        result = afd_var(lex) or result
 
     if lex.isdigit():
-        result = afd_num(lex)
+        result = afd_num(lex) or result
 
     if lex[0] == '"':
-        result = afd_str(lex)
+        result = afd_str(lex) or result
+
+    # Recursivo para caso hajam keywords "grudadas" de um caractere
+    # no lexema como ponto virgula (ex: var;),
+    # vetores (ex: [1]),
+    # operadores (ex: 1+ ), etc.
+
+    # caso haja uma keyword de um caractere no primeiro endereco
+    if lex[0] in reservados and len(lex) > 1:
+        tmp = categorizar_lex(lex[1:])
+        # necessario manter propriedade de tupla
+        classe_token = reservados.get(lex[0]) + (ESCOPO,)
+        # se retornada lista, recursao abriu e retornou mais de um token
+        if isinstance(tmp, list):
+            result = [classe_token] + tmp  # append simples
+        else:
+            result = [classe_token, tmp]
+
+    # caso haja uma keyword de um caractere ao final
+    elif lex[-1] in reservados and len(lex) > 1:
+        tmp = categorizar_lex(lex[:-1])
+        classe_token = reservados.get(lex[-1]) + (ESCOPO,)
+        if isinstance(tmp, list):
+            result = tmp + classe_token
+        else:
+            result = [tmp, classe_token]
 
     if lex in reservados:
-        result = reservados.get(lex)
+        result = reservados.get(lex) + (ESCOPO,) or result
         if result[0] == "scope_init":
-            escopo += 1
+            ESCOPO += 1
         elif result[0] == "scope_end":
-            escopo -= 1
-        result = result + (escopo,)
+            ESCOPO -= 1
 
-
-    return result if result is not None else None
+    return result

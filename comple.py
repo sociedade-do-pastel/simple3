@@ -21,7 +21,7 @@ def GetAsList(filename):
     Retorna o arquivo lido como uma lista sem caracteres de nova linha
     """
     with open(filename, "r") as arquivo:
-        return [lin.strip() for lin in arquivo.readlines() if lin != "\n"]
+        return [None if lin == '\n' else lin.strip() for lin in arquivo.readlines()]
 
 
 def FileReader(filename, listar=False):
@@ -41,8 +41,9 @@ def compiledFileSave(filename, target, lex=False):
         with open(filename, "w") as arquivo:
             for num, linhas in enumerate(target.tokens_reconhecidos, 1):
                 arquivo.write(f'Linha: {num} ')
-                for lexemas in linhas:
-                    arquivo.write(f'{str(lexemas)}, ')
+                if linhas is not None:
+                    for lexemas in linhas:
+                        arquivo.write(f'{str(lexemas)}, ')
                 arquivo.write('\n')
             arquivo.write('\n'*10)
             arquivo.write('Tabela de simbolos:\n')
