@@ -3,48 +3,54 @@ Definição de regex e tokens da linguagem
 """
 
 tokens = {
+    # Palavra-chave para tipo booleano tru (true)
+    "tru": "tru",
+
+    # Palavra-chave para tipo booleano fls (false)
+    "fls": "fls",
+    
     # Palavra-chave que representa o tipo de valor booleano
     # Utilização:
     #     tof tst = tru;
-    "tof": "keyword",
+    "tof": "tof",
 
     # Palavra-chave que representa o início de um controle de fluxo do tipo if
     # Utilização:
     #     ifi tst == fls {...
-    "ifi": "keyword",
+    "ifi": "ifi",
 
     # Palavra-chave que representa o início de um controle de fluxo do tipo
     # else
     # Utilização:
     #     els {...
-    "els": "keyword",
+    "els": "els",
 
     # Palavra-chave que representa o início de um controle de fluxo do tipo
     # else if
     # Utilização:
     #     elf tst == tru {...
-    "elf": "keyword",
+    "elf": "elf",
 
     # Palavra-chave que representa o início de um laço do tipo while
     # Utilização:
     #     whl tst == tru {...
-    "whl": "keyword",
+    "whl": "whl",
 
     # Palavra-chave que representa o início de um laço do tipo for
     # Utilização:
     #     for tst = 0:10 {...
-    "for": "keyword",
+    "for": "for",
 
     # Palavra chave que representa o tipo string
     # Utilização:
     #     str tst = "eu sou uma string";
-    "str": "type",
+    "str": "str",
 
     # Palavra-chave que representa o tipo primitivo numérico
     # (int, float, double etc)
     # Utilização:
     #     num tst = 3.1415;
-    "num": "type",
+    "num": "num",
 
     # Palavra-chave que representa o comando break, que encerra um laço de
     # repetição
@@ -53,7 +59,7 @@ tokens = {
     #         ...
     #         brk;
     #     }
-    "brk": "keyword",
+    "brk": "brk",
 
     # Palavra-chave que representa o comando continue, que salta para a próxima
     # iteração em um laço de repetição
@@ -62,7 +68,7 @@ tokens = {
     #         ...
     #         jmp;
     #     }
-    "jmp": "keyword",
+    "jmp": "jmp",
 
     # Palavra-chave que representa o comando return, utilizado para transmitir
     # alguma informação como saída de uma função
@@ -71,12 +77,42 @@ tokens = {
     #         ...
     #         ret tru;
     #     }
-    "ret": "keyword",
+    "ret": "ret",
 
-    # Palavra-chave que representa a declaração de um vetor
-    # Utilização:
-    #     vec<num> tst = [1, 3.14, 22];
-    "vec\\<(num|str)\\>": "keyword",
+    # Caractere de início de escopo
+    # Assinatura:
+    #     {...
+    "{": "scope_init",
+
+    # Caractere de fim de escopo
+    # Assinatura:
+    #     ...}
+    "}": "scope_end",
+
+    # Caractere para delimitação de chamada ou definição de função
+    # Assinatura:
+    #     {...
+    "(": "(",
+
+    # Caractere para delimitação de chamada ou definição de função
+    # Assinatura:
+    #     ...}
+    ")": ")",
+
+    # Caractere para definição ou acesso a vetor
+    # Assinatura:
+    #     {...
+    "[": "[",
+
+    # Caractere para definição ou acesso a vetor
+    # Assinatura:
+    #     ...}
+    "]": "]",
+    
+    # Caractere de fim de sentença (end of statement)
+    # Assinatura:
+    #     ...;
+    ";": "eos",
 
     # identifiers
 
@@ -87,19 +123,12 @@ tokens = {
     # (keywords não contabilizadas)
     "[A-z]{3}": "var",
 
+    # literals
+    
     # Regex para definição do tipo num
     # Tipo genérico para qualquer numeral, incluindo int, float e double
     "[0-9]+(\\.[0-9]+)?": "num",
-
-    # Regex para definição de funções
-    # Assinatura:
-    #     tipo nome_da_funcao(tipo parametro, ...)
-    "(num|str|emp) [A-z]{3}\\(((num|str) [A-z]{3}, *)*(((num|str) [A-z]{3}){1})?\\)": "func",
-
-    # Regex para chamada de funções
-    # nome_da_funcao(argumento1, argumento2 ..., argumenton)
-    "[A-z]{3}\\((.*, *)*((.*){1})?\\)": "func_call",
-
+  
     # Identificador de vazio
     # Utilizado para verificar a inexistência de valor ou tamanho
     "emp": "emp",
@@ -110,32 +139,11 @@ tokens = {
 
     # Regex para definição de comentários
     # Assinatura:
-    #     /3...\n
+    #     /3...
     # Observações:
     #     Há somente comentários de linha completa
-    "^(\\/3).*(\n)$": "comment",
-
-    # Identificador de início de escopo
-    # Assinatura:
-    #     {...
-    "{": "scope_init",
-
-    # Identificador de fim de escopo
-    # Assinatura:
-    #     ...}
-    "}": "scope_end",
-
-    # Identificador do tipo booleano tru (true)
-    "tru": "booleanT",
-
-    # Identificador do tipo booleano fls (false)
-    "fls": "booleanF",
-
-    # Identificador de fim de sentença (end of statement)
-    # Assinatura:
-    #     ...;
-    ";": "eos",
-
+    "^(\\/3).*$": "comment",
+    
     # operators
 
     # Operador binário para soma algébrica entre dois números (num)
@@ -241,9 +249,11 @@ tokens = {
     "and": "operator",
 
     # Operador binário para definicao de ranges. Recebe dois *num* e define
-    # um range
+    # um range. Obs: este não retorna "operator" devido à dificuldade
+    # de diferenciação entre operadores na análise sintática 
     # Utilização:
     #          0:1
     #           --> range de zero a um
-    ":": "operator"
+    ":": ":"
 }
+
