@@ -26,27 +26,27 @@ less tokens.py
 #+end_src
 
 ** Palavras-chave
-| *Keywords* | Expressão regular | Observação                   |
-|----------+-------------------+------------------------------|
-| =tof=      | "tof"             |                              |
-| =ifi=      | "ifi"             |                              |
-| =els=      | "els"             |                              |
-| =elf=      | "elf"             |                              |
-| =whl=      | "whl"             |                              |
-| =for=      | "for"             |                              |
-| =str=      | "str"             |                              |
-| =num=      | "num"             |                              |
-| =brk=      | "brk"             |                              |
-| =jmp=      | "jmp"             |                              |
-| =ret=      | "ret"             |                              |
-| {...}    | "\ {" e "\ }"     | definição de escopo          |
-| [...]    | "\ [" e "\ ]"     | acesso ou definição de vetor |
-| (...)    | "\ (" e "\ )"     |                              |
-| =emp=      | "emp"             | *nil* ou *null*                  |
-| =tru=      | "tru"             |                              |
-| =fls=      | "fls"             |                              |
-| =eos=      | ";"               | fim de comando/diretiva      |
-|----------+-------------------+------------------------------|
+| *Keywords*  | Expressão regular | Observação                   |
+|-----------+-------------------+------------------------------|
+| =tof=       | "tof"             |                              |
+| =ifi=       | "ifi"             |                              |
+| =els=       | "els"             |                              |
+| =elf=       | "elf"             |                              |
+| =whl=       | "whl"             |                              |
+| =for=       | "for"             |                              |
+| =str=       | "str"             |                              |
+| =num=       | "num"             |                              |
+| =brk=       | "brk"             |                              |
+| =jmp=       | "jmp"             |                              |
+| =ret=       | "ret"             |                              |
+| {...}     | "\ {" e "\ }"     | definição de escopo          |
+| \([...]\) | "\ [" e "\ ]"     | acesso ou definição de vetor |
+| (...)     | "\ (" e "\ )"     |                              |
+| =emp=       | "emp"             | *nil* ou *null*                  |
+| =tru=       | "tru"             |                              |
+| =fls=       | "fls"             |                              |
+| =eos=       | ";"               | fim de comando/diretiva      |
+|-----------+-------------------+------------------------------|
 
 ** Literais
 
