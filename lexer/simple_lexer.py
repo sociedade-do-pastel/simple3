@@ -44,24 +44,64 @@ class simple_lexer:
         # talvez utilize em mais de um lugar
         return isinstance(self.linhas, list)
 
+    def __add_to_symTable(self, sim_tbl):
+        self.tabela_simb.insert(sim_tbl[1],
+                                sim_tbl[0],
+                                sim_tbl[2])
+
     def reconhecer(self, uma_linha):
-        # retornam-se os tokens de uma unica linha
-        # cada token seria objeto instanciado da clase Token
         lista_tokens = []
-        for token in uma_linha.split():
-            lex_categorizado = []
-            result = afds.categorizar_lex(token)
-            # retornada uma lista de tokens ou um unico
-            lex_categorizado += result if isinstance(
-                result, list) else [result]
+        tamanho_linha = len(uma_linha)
 
-            if None in lex_categorizado:
-                return None
+        # caso seja um comentário, ignore a linha
+        if uma_linha[0:2] == '/3':
+            return lista_tokens
 
-            # O(n) no pior caso, O(1) sem recursoes
-            for lista_tok in lex_categorizado:
-                self.tabela_simb.insert(lista_tok[1],
-                                        lista_tok[0],
-                                        lista_tok[2])  # tuplas atrapalham aqui
-                lista_tokens.append(tk.Token(lista_tok))
+        p1 = 0                  # ponteiro para o início da substring
+        p2 = 0                  # ponteiro para o final da substring
+        num_temp = ''
+        num_received = False
+
+        while (p1 < tamanho_linha and p2 < tamanho_linha):
+
+            # se uma_linha na posição p1 for espaço, ignora
+            if uma_linha[p1] == ' ':
+                p2 += 1
+                p1 += 1
+                continue
+
+            result = afds.categorizar_lex(uma_linha[p1:p2+1])
+
+            p2 += 1
+
+            # como é possível identificar um subnúmero como um número, ele
+            # salva o token encontrado e prossegue lendo em um range maior;
+            # quando não for mais um número encontrado, esse último estado
+            # salvo é o maior número encontrado
+            if num_received:
+                # um número terminado em ponto não é reconhecido, ignorar
+                if uma_linha[p2-1] == '.':
+                    continue
+                # atualiza o estado de num encontrado
+                elif result and result[0] == 'num':
+                    num_temp = result
+                    continue
+                # parou de receber num em range maior
+                else:
+                    num_received = False
+                    lista_tokens.append(num_temp)
+                    self.__add_to_symTable(num_temp)
+                    p2 -= 1
+                    p1 = p2
+
+            # token encontrado
+            if result:
+                if result[0] == 'num':
+                    num_temp = result
+                    num_received = True
+                else:
+                    lista_tokens.append(result)
+                    self.__add_to_symTable(result)
+                    p1 = p2
+
         return lista_tokens

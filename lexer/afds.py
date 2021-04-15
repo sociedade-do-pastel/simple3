@@ -171,36 +171,11 @@ def categorizar_lex(lex):
     if len(lex) == 3 and lex not in reservados:
         result = afd_var(lex) or result
 
-    if lex.isdigit():
+    if lex.replace('.', '', 1).isdigit():
         result = afd_num(lex) or result
 
     if lex[0] == '"':
         result = afd_str(lex) or result
-
-    # Recursivo para caso hajam keywords "grudadas" de um caractere
-    # no lexema como ponto virgula (ex: var;),
-    # vetores (ex: [1]),
-    # operadores (ex: 1+ ), etc.
-
-    # caso haja uma keyword de um caractere no primeiro endereco
-    if lex[0] in reservados and len(lex) > 1:
-        tmp = categorizar_lex(lex[1:])
-        # necessario manter propriedade de tupla
-        classe_token = reservados.get(lex[0]) + (ESCOPO,)
-        # se retornada lista, recursao abriu e retornou mais de um token
-        if isinstance(tmp, list):
-            result = [classe_token] + tmp  # append simples
-        else:
-            result = [classe_token, tmp]
-
-    # caso haja uma keyword de um caractere ao final
-    elif lex[-1] in reservados and len(lex) > 1:
-        tmp = categorizar_lex(lex[:-1])
-        classe_token = reservados.get(lex[-1]) + (ESCOPO,)
-        if isinstance(tmp, list):
-            result = tmp + classe_token
-        else:
-            result = [tmp, classe_token]
 
     if lex in reservados:
         result = reservados.get(lex) + (ESCOPO,) or result
