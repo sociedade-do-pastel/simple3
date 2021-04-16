@@ -6,39 +6,43 @@
 class SymbolsTable():
     def __init__(self):
         """
-            Quando a classe SymbolsTable for instanciada, 
-            será criado um dicionário vazio chamado 'table' 
+            Quando a classe SymbolsTable for instanciada,
+            será criado um dicionário vazio chamado 'table'
             para armazenar as variáveis.
         """
         self._table = dict()
-    
+
     def get_table(self):
         """
-            O método 'get_table()',
-            retorna uma cópia do dicionário 'table' contendo o nome das variáveis e seus respectivos tipos e scopos.
+            O método 'get_table()', retorna uma cópia do dicionário 'table'
+            contendo o nome das variáveis e seus respectivos tipos e escopos.
             Caso não encontre o dicionário, será retornado None.
         """
         return self._table.copy()
 
-    def insert(self, name, type, scope):
+    def insert(self, name, rec_type, scope):
         """Insere ou atualiza um símbolo na tabela.
 
         Argumentos:
         name  -- nome do símbolo e também sua chave na tabela
-        type  -- tipo do símbolo
+        rec_type  -- tipo do símbolo
         scope -- escopo no qual o símbolo pertence
 
         Retorno:
         Conteúdo da linha do elemento inserido.
         """
-        
+
         name_exists = self._table.get(name)
 
-        if name_exists:
-            self._table[name].update({ 'type': type, 'scope': scope })
+        if scope > 0:
+            name_scope = "local"
         else:
-            self._table[name] = dict({ 'type': type, 'scope': scope })
+            name_scope = "global"
 
+        if name_exists:
+            self._table[name].append({'type': rec_type, 'scope': name_scope})
+        else:
+            self._table[name] = [dict({'type': rec_type, 'scope': name_scope})]
 
         return self._table
 
@@ -48,7 +52,7 @@ class SymbolsTable():
 
         Argumentos:
         name -- "Nome" do símbolo a ser procurado
-        
+
         Retorno:
         Valor do símbolo a ser encontrado ou None
 
