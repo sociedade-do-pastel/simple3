@@ -104,4 +104,9 @@ class simple_lexer:
                     self.__add_to_symTable(result)
                     p1 = p2
 
+        # se p1 for diferente de p2 significa que a linha foi finalizada com um
+        # bloco não reconhecido, portanto, não aceita
+        if p1 != p2:
+            return None
+
         return lista_tokens
