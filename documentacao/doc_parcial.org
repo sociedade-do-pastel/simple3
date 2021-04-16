@@ -98,7 +98,8 @@ comum dá se por:
 Note que a extensão do arquivo deve conter, necessariamente, o sufixo
 =.sp3=. Qualquer outro arquivo será negado pelo compilador. O executável
 de saída após a compilação tem o nome fixo =output.py= (no momento
-=output.txt=).
+=output.txt=). Além disso, devido à dificuldades relacionadas à variável de *PATH*, é
+recomendado que o /script/ seja executado na pasta raiz do projeto. 
 
 ** Particularidades do analisador léxico
    Trata-se de um componente que executa uma única passagem. Caso seja
@@ -107,7 +108,7 @@ disponibilizado para aqueles que tenham interesse em saber qual /token/
 foi reconhecido em determinada linha *x*. Devido à natureza de analisadores
 léxicos de passagem única, não foi implementado um método =get_next_token=.
 
-\clearpage
+#+latex: \clearpage
 ** Exemplo de arquivo fonte
 Um arquivo fonte da *Simple3* tem estrutura semelhante ao exemplo a
 seguir:
@@ -124,8 +125,13 @@ símbolos.
 A saída tem como formato:
 
 #+begin_example
-Linha x: Tipo=<type>, valor=<value>
+Linha x: (<tipo>, <valor>, escopo)
 
 Tabela de simbolos
 <valores da tabela>
+...
 #+end_example
+
+Na qual =escopo= tem valor de 0 (global) a 1 (local). Note que uma variável
+nomeada pode aparecer em mais de um local, a priorização, entretanto, será
+tratada em fases posteriores.
