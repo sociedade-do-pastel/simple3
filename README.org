@@ -1,0 +1,49 @@
+#+title: Simple3: O compilador para a linguagem smp assim
+* O projeto
+  *Simple3*, como seu nome já diz, tem como foco o minimalismo de seus arquivos
+  fontes, a declaração de uma variável do tipo numérico pode ser dada por:
+
+  #+begin_example
+  num smp = 12;
+  str aaa = "AAAAAAAAAAAAAAAAAAAAAAAA";
+  #+end_example
+
+  Note que, semelhantemente às linguagens derivadas da linguagem C, as diretivas
+  sempre são terminadas com ponto e vírgula. 
+  
+  Este é um projeto para a matéria de *Compiladores* do curso de Ciência da
+  Computação do Centro Universitário FEI.
+  
+* Membros
+  | Nome                            |         RA |
+  |---------------------------------+------------|
+  | Leon Ferreira Bellini           | 22218002-8 |
+  | Pedro Freitas Magalhães Barbosa | 22218007-7 |
+  | Felipe Maciel de Sousa          | 22218013-5 |
+  | Guilherme Ormond Sampaio        | 22218042-4 |
+  |---------------------------------+------------|
+
+* Como utilizar o compilador
+  Consulte o arquivo contido na pasta =documentacao=, [[file:documentacao/doc_parcial.org][doc_parcial]]. Este contém
+  exemplos e instruções de como utilizar o compilador.  Note que *até o momento,
+  apenas é possível realizar a análise léxica*
+
+  
+* O andamento do projeto
+  
+** DONE Analisador léxico [6/6]
+    - [X] Definição dos /tokens/ da linguagem
+    - [X] Definição da tabela de símbolos
+    - [X] Construção dos autômatos
+      + [X] Autômato para /string/
+      + [X] Autômato para identificador (var)
+      + [X] Autômato para números
+    - [X] Priorização dos autômatos
+    - [X] Tratamento de comentários e linhas vazias
+    - [X] Tratamento de erros e casos especiais
+
+** TODO Analisador sintático
+   - [ ] Definição da sintaxe da linguagem
+     
+** TODO Analisador semântico
+  
