@@ -1,5 +1,5 @@
 from simple_exceptions.exceptions import ErroLexer
-from . import sym_table, afds, token as tk
+from . import sym_table, afds
 import sys
 sys.path.append("..")
 
