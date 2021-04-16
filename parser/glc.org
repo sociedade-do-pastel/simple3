@@ -1,0 +1,16 @@
+#+title: Gramática livre de contexto
+#+options: toc:nil date:nil
+#+attr_latex: \usepackage[margin=3cm]{geometry}
+
+* Gramática Simple3
+\begin{align*}
+S &\rightarrow \text{DECVAR | MATLAB | FLUX} \\
+\text{DECVAR} &\rightarrow \text{TIPO IDENTIFICADOR EQ LITERAL FINALIZADOR}\\
+\text{TIPO} &\rightarrow \text{num | str | tof}\\
+\text{EQ} &\rightarrow \thickspace= \\
+\text{LITERAL} &\rightarrow \text{[A-z]\{3\} | MATLAB \thickspace| tru | fls}\\
+\text{FINALIZADOR} &\rightarrow \text{;} \\
+\text{MATLAB} &\rightarrow \text{MATLAB OPERADOR MATLAB [FINALIZADOR]} \thickspace|\thickspace [0-9]^{+}(\backslash .[0-9]^{+})?\\
+\text{OPERADOR} &\rightarrow \text{+ | - | / | * | }\hat{}\\
+\text{FLUX} &\rightarrow
+\end{align*}
