@@ -23,25 +23,70 @@ no arquivo =tokens.py= como mostrado no exemplo abaixo:
 less tokens.py 
 #+end_src
 
+** Palavras-chave
+| *Keywords* | Expressão regular    |
+|----------+----------------------|
+| =tof=      | "tof"                |
+| =ifi=      | "ifi"                |
+| =els=      | "els"                |
+| =elf=      | "elf"                |
+| =whl=      | "whl"                |
+| =for=      | "for"                |
+| =str=      | "str"                |
+| =num=      | "num"                |
+| =brk=      | "brk"                |
+| =jmp=      | "jmp"                |
+| =ret=      | "ret"                |
+| =vec=      | "vec\<(num \vert str)\>" |
+|----------+----------------------|
+
+** Identificadores
+
+| Identificadores | Expressão regular   | Observação              |
+|-----------------+---------------------+-------------------------|
+| =var=             | "[A-z]{3}"          |                         |
+| =num=             | "[0-9]+(\.[0-9]+)?" |                         |
+| =str=             | "\"[\wedge\"]*\""        |                         |
+| =func=            | /checar abaixo/       |                         |
+| =emp=             | "emp"               |                         |
+| =comment=         | "\wedge(\/3).*(\\n)\dollar"    |                         |
+| \(\{...\}\)     | "\ {" e "\ }"       | definição de escopo     |
+| =tru=             | "tru"               |                         |
+| =fls=             | "fls"               |                         |
+| =eos=             | "\;"                | fim de comando/diretiva |
+|-----------------+---------------------+-------------------------|
+
+- Por ser longo demais, não foi possível inserir a expressão regular para definição e leitura de funções,
+  esta dá-se pela concatenação de:
+  - Tipo de retorno da função, =num= ou =str=: \((num \vert str)\)
+  - Um único espaço em branco
+  - Nome da função, semelhante a =var=: [A-z]{3}
+  - Abertura de parênteses para lista de parâmetros: \(
+  - Infinitos ou nenhum parâmetro nomeado e com tipo, separados por vírgula e um espaço: 
+    1. \(((num \vert str)\thickspace[A-z]\{3\},\thickspace\ast)\ast(((num \vert str)\thickspace[A-z]\{3\})\{1\})? \)
+  - Fechamento da lista de parâmetros: \)
+
+
+
 ** Operadores
 
-| Operador   | Descrição |
-|------------+-----------|
-| \(+\)      |           |
-| \(-\)      |           |
-| \(*\)      |           |
-| \(/\)      |           |
-| \(\hat{}\) |           |
-| \(>\)      |           |
-| \(<\)      |           |
-| \(>=\)     |           |
-| \(<=\)     |           |
-| \(=\)      |           |
-| \(==\)     |           |
-| \(!\)      |           |
-| =orr=        |           |
-| =and=        |           |
-|------------+-----------|
+| Operador   | Expressão regular |
+|------------+-------------------|
+| \(+\)      | "\+"              |
+| \(-\)      | "\-"              |
+| \(*\)      | "\*"              |
+| \(/\)      | "\/"              |
+| \(\hat{}\) | "\wedge"              |
+| \(>\)      | "\>"              |
+| \(<\)      | "\<"              |
+| \(>=\)     | "\>\="            |
+| \(<=\)     | "\<\="            |
+| \(=\)      | "\="              |
+| \(==\)     | "\=\="            |
+| \(!\)      | "\!"              |
+| =orr=        | "orr"             |
+| =and=        | "and"             |
+|------------+-------------------|
 
 
 * Utilização do compilador
@@ -58,6 +103,8 @@ Note que a extensão do arquivo deve conter, necessariamente, o sufixo =.sp3=. Q
 arquivo será negado pelo compilador. O executável de saída após a compilação tem
 o nome fixo =output.py=. 
 
-** Arquivo fonte
+\clearpage
+** Exemplo de arquivo fonte
+Um arquivo fonte da *Simple3* tem estrutura semelhante ao exemplo a seguir:
 #+include: ./arquivo_teste.sp3 example
 
