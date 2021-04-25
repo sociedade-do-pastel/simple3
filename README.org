@@ -42,8 +42,19 @@
     - [X] Tratamento de comentários e linhas vazias
     - [X] Tratamento de erros e casos especiais
 
-** TODO Analisador sintático
-   - [ ] Definição da sintaxe da linguagem
+** TODO Analisador sintático [1/2]
+   - [X] Definição da sintaxe da linguagem
+   - [ ] Implementação do analisador sintático recursivo descendente
+     - [ ] S
+     - [ ] DECVAR
+     - [ ] BOOL
+     - [ ] MATLAB
+     - [ ] OPERADOR
+     - [ ] FLUX
+     - [ ] EXPR
+     - [ ] OPBOOL
+     - [ ] RPT
+     - [ ] RANGE
      
 ** TODO Analisador semântico
   
