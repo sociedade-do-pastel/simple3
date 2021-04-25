@@ -1,7 +1,5 @@
-from simple_exceptions.exceptions import ErroLexer
+from .lexer_exceptions import ErroLexer
 from . import sym_table, afds
-import sys
-sys.path.append("..")
 
 
 class simple_lexer:

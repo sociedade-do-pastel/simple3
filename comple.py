@@ -13,6 +13,7 @@ import sys
 from simple_exceptions import exceptions
 # aqui virao os analisadores lexico e sintatico
 from lexer.simple_lexer import simple_lexer
+from lexer.lexer_exceptions import ErroLexer
 # from parser import parser # same as before
 
 
@@ -72,7 +73,7 @@ def main(argv):
     try:
         lexing_object = simple_lexer(alvo_comp)
         lexing_object.analise_lexica()
-    except exceptions.ErroLexer as LexErr:
+    except ErroLexer as LexErr:
         print(LexErr, sys.stderr)
     # TODO tratar filenames de saída customizáveis (necessário?)
     compiledFileSave(filename_to_save,
