@@ -19,7 +19,8 @@ class Parser(list):
             "expr": ["(", ")", "and", "orr"],
             "opbool": ["==", ">", ">=", "<", "<="],
             "rpt": ["whl", "for", "(", ")",
-                    "scope_init", "scope_end", "type", "operator", "var"]
+                    "scope_init", "scope_end", "type", "operator", "var"],
+            "range": ["num", ":"]
         }
 
     def error(self):
@@ -46,14 +47,16 @@ class Parser(list):
     def literal(self):
         pass
 
-    def bo0l(self):  # lembra q tem o 0
-        pass
+    def bool_ean(self):
+        # BOOL = tru | fls
+        self.eat_generic("bool")
 
     def matlab(self):
         pass
 
     def operador(self):
-        pass
+        # OPERADOR = + | - | / | * | ^
+        self.eat_generic("operador")
 
     def flux(self):
         pass
@@ -62,10 +65,20 @@ class Parser(list):
         pass
 
     def opbool(self):
-        pass
+        # OPBOOL = == | > | >= | < | <=
+        self.eat_generic("opbool")
 
     def rpt(self):
         pass
 
-    def r4nge(self):  # lembra q tem o 4
+    def ranger(self):
         pass
+
+    def eat_generic(self, dic_string):
+        '''
+        Consome um token baseado na entrada presente no dicionário de tokens
+        por nível.
+        '''
+        for token_value in self.tokens_aceitos[dic_string]:
+            if token_value == self.current_token[1]:
+                self.eat(token_value)
