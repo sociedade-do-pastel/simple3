@@ -32,17 +32,49 @@ class Parser(list):
         if self.current_token[0] == token_type:
             self.current_token = self.lexer.get_next_token()
         else:
-            self.erro()  # TODO implementar a classe de erro
+            self.error()  # TODO implementar a classe de erro
 
-    """
-        Isso aqui é o S dos não terminais
-    """
-
+    # Isso aqui é o S dos não terminais
     def init(self):
-        pass
+        while True:
+            try:
+                self.decvar()
+                # self.matlab()
+                # self.flux()
+                # self.rpt()
+
+                if self.current_token is None: 
+                    # TODO se for montar árvore, aqui que tá o \n
+                    self.current_token = self.lexer.get_next_token()
+
+            except Exception as e:
+                print(e)
+                break
 
     def decvar(self):
-        pass
+        pace = 0
+
+        while pace < 5:
+            if self.current_token[0] == "type" and pace == 0:
+                self.eat("type")
+                pace += 1
+            elif self.current_token[0] == "var" and pace == 1:
+                self.eat("var")
+                pace += 1
+            elif self.current_token[0] == "operator" and pace == 2:
+                self.eat("operator")
+                pace += 1
+            elif self.current_token[0] in ("str", "num") and pace == 3:
+                self.eat("str" if self.current_token[0] == "str" else "num")
+                pace += 1
+            elif self.current_token[0] == "eos" and pace == 4:
+                self.eat("eos")
+                print("DECVAR validado com sucesso!")
+                pace += 1
+            else:
+                self.error()
+
+
 
     def literal(self):
         pass
