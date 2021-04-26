@@ -16,6 +16,8 @@ class simple_lexer:
         self.linhas = linhas_p_tratar
         self.tabela_simb = sym_table.SymbolsTable()
         self.tokens_reconhecidos = []
+        self.flattened_list = []
+        self.current_token_it = None
 
     def analise_lexica(self):
         '''
@@ -37,6 +39,29 @@ class simple_lexer:
 
     def get_tokens(self, linha_escolhida):
         return self.tokens_reconhecidos[linha_escolhida+1]
+
+    def get_next_token(self):
+        '''
+        Funciona como um singleton.
+        Itera =current_token_it= a cada vez que e chamado.
+        '''
+        if self.current_token_it is None:
+            self.current_token_it = iter(self.flattened_list)
+        return next(self.current_token_it)
+
+    def flatten_token_list(self):
+        '''
+        flatten_token_list gera uma lista "plana".
+        Uma vez que a simple3 funciona com
+        terminadores de diretiva ";", isso se torna possivel e, alem disso,
+        facilita o trabalho de gerar um token a seguir.
+
+        '''
+        for lines in self.tokens_reconhecidos:
+            if lines is None:
+                continue
+            for tokens in lines:
+                self.flattened_list.append(tokens)
 
     def lista_p(self):
         # talvez utilize em mais de um lugar
