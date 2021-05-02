@@ -76,7 +76,7 @@ def main(argv):
     except ErroLexer as LexErr:
         print(LexErr, sys.stderr)
     try:
-        parsing_object = Parser(lexing_object)
+        parsing_object = Parser(lexing_object, transpilar=False)
         # parsing_object.init()
     except Exception as exx:
         print(exx)
