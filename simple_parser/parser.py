@@ -13,6 +13,8 @@ class Parser():
         # teste de transpilação
         self.transpilar = transpilar
         self.code = ""
+        # teste de debug
+        self.code_line = 1
         # dicionario de tokens aceitos em cada nivel
         self.token_aceitos = {
             "decvar": ["type", "var", "operator", "eos"],
@@ -49,6 +51,7 @@ class Parser():
             if self.transpilar and self.code[-1] != '\n':
                 self.code += "\n"
             self.current_token = self.next_token
+            self.code_line += 1
             try:
                 self.next_token = self.lexer.get_next_token()
             except:
@@ -66,13 +69,17 @@ class Parser():
                 print(f'{d[chave]} validado!')
                 self.check_eol()
                 chave = 0
-            except IndexError as idx_err:
+            except IndexError:
+                if self.current_token is not None and self.next_token is not None:
+                    self.error(f"Erro na linha {self.code_line}: cadeia não reconhecida pela linguagem.")
+
                 if self.transpilar:
                     print("\n\nOLHA O CÓDIGO EM PYTHON AI:")
                     print(self.code, end="")
                 sys.exit()
             except Exception as e:
-                if "deu merda" in e.args: # TODO mudar o erro aqui depois
+                if "interrupt" in e.args:
+                    self.error(f"Erro na linha {self.code_line}: cadeia não reconhecida pela linguagem.")
                     sys.exit()
                 chave += 1
 
@@ -93,35 +100,8 @@ class Parser():
                 self.eat("operator")
                 pace += 1
             elif pace == 3:
-                if self.current_token[0] == "str":
-                    if self.transpilar: self.code += self.current_token[1] + " "
-                    self.eat("str")
-                    pace += 1
-                elif self.current_token[0] == "num":
-                    if self.next_token is not None and self.next_token[0] == "operator":
-                        self.matlab(consume_eos=False)
-                    else:
-                        if self.transpilar: self.code += self.current_token[1] + " "
-                        self.eat("num")
-                    pace += 1
-                elif self.current_token[0] == "var":
-                    if self.next_token is not None and self.next_token[0] == "operator":
-                        self.matlab(consume_eos=False)
-                    else:
-                        if self.transpilar: self.code += self.current_token[1] + " "
-                        self.eat("var")
-                    pace += 1
-                elif self.current_token[0] == "tru":
-                    if self.transpilar: self.code += "True "
-                    self.eat("tru")
-                    pace += 1
-                elif self.current_token[0] == "fls":
-                    if self.transpilar: self.code += "False "
-                    self.eat("fls")
-                    pace += 1
-                elif self.current_token[1] == "(":
-                    self.matlab(consume_eos=False)
-                    pace += 1
+                self.literal()
+                pace += 1
             elif self.current_token[0] == "eos" and pace == 4:
                 self.eat("eos")
                 pace += 1
@@ -129,45 +109,89 @@ class Parser():
                 self.error("erro do decvar")
 
     def literal(self):
-        pass
+        if self.current_token[0] == "str":
+            if self.transpilar: self.code += self.current_token[1] + " "
+            self.eat("str")
+        elif self.current_token[0] == "num":
+            if self.next_token is not None and self.next_token[0] == "operator":
+                self.matlab(consume_eos=False)
+            else:
+                if self.transpilar: self.code += self.current_token[1] + " "
+                self.eat("num")
+        elif self.current_token[0] == "var":
+            if self.next_token is not None and self.next_token[0] == "operator":
+                self.matlab(consume_eos=False)
+            else:
+                if self.transpilar: self.code += self.current_token[1] + " "
+                self.eat("var")
+        else:
+            token_b4_matlab = self.current_token
+            try:
+                self.matlab(consume_eos=False)
+            except:
+                if self.current_token == token_b4_matlab:
+                    self.bool_ean()
+                else:
+                    self.erro("erro no literal")
 
     def bool_ean(self):
         # BOOL = tru | fls
-        self.eat_generic("bool")
+        if self.current_token[0] == "tru":
+            if self.transpilar: self.code += "True "
+            self.eat("tru")
+        elif self.current_token[0] == "fls":
+            if self.transpilar: self.code += "False "
+            self.eat("fls")
+        else:
+            self.erro("erro no bool")
 
     def matlab(self, consume_eos=True):
-        # MATLAB  ->  MATLAB' OPERADOR MATLAB [eos] | MATLAB'
-        # MATLAB' ->  num | var | ( MATLAB )
+        # MATLAB   ->  MATLAB' (+ | -) MATLAB' [eos] | MATLAB'
+        # MATLAB'  ->  MATLAB'' (* | / | ^) MATLAB'' [eos] | MATLAB''
+        # MATLAB'' ->  num | var | '(' MATLAB ')'
+        node = self.matlab1(consume_eos)
 
-        self.matlab2(consume_eos)
-
-        token = self.current_token[0]
-        if self.current_token[1] in self.token_aceitos["operador"]:
+        while self.current_token[1] in ('+', '-'):
+            token = self.current_token
             if self.transpilar: self.code += self.current_token[1] + " "
-            self.eat(token)
-            self.matlab(consume_eos)
-        elif consume_eos and token == "eos":
-            self.eat("eos")
-        while self.current_token is not None and self.current_token[0] == ")":
-            # ALERTA! GAMBIARRA!
-            self.matlab(consume_eos)
+            self.eat(token[0])
+            if consume_eos and token == "eos":
+                self.eat("eos")
+            node = node + token[1] + self.matlab1(consume_eos)
+
+        return node
+
+    def matlab1(self, consume_eos=True):
+        node = self.matlab2(consume_eos)
+
+        while self.current_token[1] in ('*', '/', '^'):
+            token = self.current_token
+            if self.transpilar: self.code += self.current_token[1] + " "
+            self.eat(token[0])
+            node = node + token[1] + self.matlab2(consume_eos)
+        
+        return node
 
     def matlab2(self, consume_eos=True):
-        token = self.current_token[0]
+        token = self.current_token
 
-        if token == "num":
+        if token[0] == "num":
             if self.transpilar: self.code += self.current_token[1] + " "
             self.eat("num")
-        elif token == "var":
+            return str(token[1])
+        elif token[0] == "var":
             if self.transpilar: self.code += self.current_token[1] + " "
             self.eat("var")
-        elif token == "(":
+            return str(token[1])
+        elif token[0] == "(":
             if self.transpilar: self.code += self.current_token[1] + " "
             self.eat("(")
-            self.matlab(consume_eos)
-        elif token == ")":
+            node = self.matlab(consume_eos)
             if self.transpilar: self.code += self.current_token[1] + " "
             self.eat(")")
+            return '(' + node + ')'
+        else:
+            self.erro("erro no matlab")
 
 
     def operador(self):
@@ -175,8 +199,7 @@ class Parser():
         self.eat_generic("operador")
 
     def flux(self):
-        if self.current_token is None:
-            self.erro("erro no flux")
+        self.erro("erro no flux")
         pass
 
     def expr(self):
@@ -187,8 +210,7 @@ class Parser():
         self.eat_generic("opbool")
 
     def rpt(self):
-        if self.current_token is None:
-            self.erro("erro no rpt")
+        self.erro("erro no rpt")
         pass
 
     def ranger(self):
