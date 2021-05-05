@@ -1,0 +1,9 @@
+/3 This program is an example
+/3 Here, we have a procedure that
+/3 takes a temperature reading in
+/3 degrees and converts it to farenheit
+
+num fah = 50;
+
+num deg = ((fah - 32)*5)/9;
+
