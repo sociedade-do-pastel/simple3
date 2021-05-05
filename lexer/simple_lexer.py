@@ -84,7 +84,6 @@ class simple_lexer:
         p1 = 0                  # ponteiro para o início da substring
         p2 = 0                  # ponteiro para o final da substring
         num_temp = ''
-        num_received = False
 
         while (p1 < tamanho_linha and p2 < tamanho_linha):
 
@@ -102,31 +101,35 @@ class simple_lexer:
             # salva o token encontrado e prossegue lendo em um range maior;
             # quando não for mais um número encontrado, esse último estado
             # salvo é o maior número encontrado
-            if num_received:
-                # um número terminado em ponto não é reconhecido, ignorar
-                if uma_linha[p2-1] == '.':
-                    continue
-                # atualiza o estado de num encontrado
-                elif result and result[0] == 'num':
-                    num_temp = result
-                    continue
-                # parou de receber num em range maior
-                else:
-                    num_received = False
-                    lista_tokens.append(num_temp)
-                    self.__add_to_symTable(num_temp)
-                    p2 -= 1
-                    p1 = p2
 
             # token encontrado
             if result:
+                if result[1] in ("<", ">", "="):
+                    test = afds.categorizar_lex(uma_linha[p1:p2+1])
+                    if test:
+                        p2 += 1
+                        result = test
+
                 if result[0] == 'num':
-                    num_temp = result
-                    num_received = True
-                else:
-                    lista_tokens.append(result)
-                    self.__add_to_symTable(result)
-                    p1 = p2
+                    i = 0
+                    while (p2 + i < tamanho_linha):
+                        num_temp = afds.categorizar_lex(uma_linha[p1:p2+1+i])
+                        if uma_linha[p2-1+i] == '.':
+                            i += 1
+                            continue
+
+                        if num_temp:
+                            result = num_temp
+                            i += 1
+                            if p2 + i >= tamanho_linha:
+                                p2 += i
+                        else:
+                            p2 += i
+                            break
+
+                lista_tokens.append(result)
+                self.__add_to_symTable(result)
+                p1 = p2
 
         # se p1 for diferente de p2 significa que a linha foi finalizada com um
         # bloco não reconhecido, portanto, não aceita
