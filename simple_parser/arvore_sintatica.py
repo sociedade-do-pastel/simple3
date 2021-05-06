@@ -1,7 +1,7 @@
-from ABC import abc, abstractmethod
+from abc import ABC, abstractmethod
 
 
-class Node(abc):
+class Node(ABC):
     @abstractmethod
     def solve(self):
         pass
@@ -38,7 +38,7 @@ class BinOp(Node):
         pass
 
     def __str__(self):
-        return f"{self.left} {self.operator} {self.right}"
+        return f"( {self.left} {self.operator} {self.right} )"
 
 
 class UnOP(Node):
@@ -208,6 +208,7 @@ class Var(Node):
         '''
         self.value = value
 
+
     def solve(self):
         pass
 
@@ -240,3 +241,25 @@ class Control(Node):
 
     def __str__(self):
         return self.value
+
+class Decvar(Node):
+    def __init__(self, var_type, var, literal):
+        '''
+            Construtor padrão de um nó o qual representa a declaração
+            de uma variável
+
+            Argumentos:
+
+            var_type -- recebe uma instância da classe Type
+            var -- recebe uma instância da classe Var
+            literal -- recebe uma instância da classe Num, Str ou Bool 
+        '''
+        self.var_type = var_type
+        self.var = var
+        self.literal = literal
+
+    def solve(self):
+        pass
+
+    def __str__(self):
+        return f"{self.var_type} {self.var} = {self.literal}"
