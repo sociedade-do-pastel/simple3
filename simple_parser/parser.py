@@ -1,4 +1,5 @@
 import sys
+from . import arvore_sintatica as sinTree
 
 
 class Parser():
@@ -12,17 +13,29 @@ class Parser():
     def error(self, message=False):
         raise Exception(message if message else "deu merda")  # arrumar depois
 
-    def eat(self, token_type):
-        # token = (tipo, valor, escopo)
-        # verifica apenas o primeiro endereço
-        if self.current_token[0] == token_type:
-            self.current_token = self.next_token
-            try:
-                self.next_token = self.lexer.get_next_token()
-            except Exception:
-                self.next_token = None
+    def eat(self):
+        """
+            Avança para o próximo token
+        """
+        self.index += 1
+        self.current_token = self.token_list[self.index]
+
+    def vomit(self):
+        """
+            Retrocede para o token anterior
+        """
+        if self.index == 0:
+            pass
         else:
-            self.error()  # TODO implementar a classe de erro
+            self.index += 1
+            self.current_token = self.token_list[self.index]
+
+    def rollback_to(self, time):
+        """
+            Seta o token para um index especificado
+        """
+        self.index = time
+        self.current_token = self.token_list[self.index]
 
     def check_eol(self):
         if self.current_token is None:
@@ -93,46 +106,28 @@ class Parser():
                 self.error("erro do decvar")
 
     def literal(self):
+        # str | MATLAB | BOOL
         if self.current_token[0] == "str":
-            if self.transpilar:
-                self.code += self.current_token[1] + " "
-            self.eat("str")
-        elif self.current_token[0] == "num":
-            if self.next_token is not None and self.next_token[0] == "operator":
-                self.matlab(consume_eos=False)
-            else:
-                if self.transpilar:
-                    self.code += self.current_token[1] + " "
-                self.eat("num")
-        elif self.current_token[0] == "var":
-            if self.next_token is not None and self.next_token[0] == "operator":
-                self.matlab(consume_eos=False)
-            else:
-                if self.transpilar:
-                    self.code += self.current_token[1] + " "
-                self.eat("var")
-        else:
-            token_b4_matlab = self.current_token
-            try:
-                self.matlab(consume_eos=False)
-            except Exception():
-                if self.current_token == token_b4_matlab:
-                    self.bool_ean()
-                else:
-                    self.erro("erro no literal")
+            return sinTree.Str(self.current_token[1])
+
+        a = self.matlab()
+        if a is not None:
+            return a
+
+        a = self.bool_ean()
+        if a is not None:
+            return a
+
+        return None
 
     def bool_ean(self):
         # BOOL = tru | fls
-        if self.current_token[0] == "tru":
-            if self.transpilar:
-                self.code += "True "
-            self.eat("tru")
-        elif self.current_token[0] == "fls":
-            if self.transpilar:
-                self.code += "False "
-            self.eat("fls")
+        if self.current_token[0] in ("tru", "fls"):
+            a = sinTree.Bool(self.current_token[1])
+            self.eat()
+            return a
         else:
-            self.erro("erro no bool")
+            return None
 
     def matlab(self, consume_eos=True):
         # MATLAB   ->  MATLAB' (+ | -) MATLAB' [eos] | MATLAB'
@@ -255,8 +250,13 @@ class Parser():
         return False
 
     def opbool(self):
-        # OPBOOL = == | > | >= | < | <=
-        self.eat_generic("opbool")
+        tokens_aceitos = ("==", ">", ">=", "<", "<=")
+        if self.current_token[1] in tokens_aceitos:
+            a = sinTree.BinOp(None, self.current_token[1], None)
+            self.eat()
+            return a
+        else:
+            return None
 
     def rpt(self):
         self.erro("erro no rpt")

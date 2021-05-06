@@ -14,7 +14,7 @@ from simple_exceptions import exceptions
 # aqui virao os analisadores lexico e sintatico
 from lexer.simple_lexer import simple_lexer
 from lexer.lexer_exceptions import ErroLexer
-from simple_parser.simple_parser import Parser
+from simple_parser.parser import Parser
 
 
 def GetAsList(filename):
