@@ -8,7 +8,7 @@ tokens = {
 
     # Palavra-chave para tipo booleano fls (false)
     "fls": "fls",
-    
+
     # Palavra-chave que representa o tipo de valor booleano
     # Utilização:
     #     tof tst = tru;
@@ -70,15 +70,6 @@ tokens = {
     #     }
     "jmp": "jmp",
 
-    # Palavra-chave que representa o comando return, utilizado para transmitir
-    # alguma informação como saída de uma função
-    # Utilização:
-    #     {
-    #         ...
-    #         ret tru;
-    #     }
-    "ret": "ret",
-
     # Caractere de início de escopo
     # Assinatura:
     #     {...
@@ -108,7 +99,7 @@ tokens = {
     # Assinatura:
     #     ...}
     "]": "]",
-    
+
     # Caractere de fim de sentença (end of statement)
     # Assinatura:
     #     ...;
@@ -124,12 +115,12 @@ tokens = {
     "[A-z]{3}": "var",
 
     # literals
-    
+
     # Regex para definição do tipo num
     # Tipo genérico para qualquer numeral, incluindo int, float e double
     "[0-9]+(\\.[0-9]+)?": "num",
-  
-    # Identificador de vazio
+
+    # Literal de vazio
     # Utilizado para verificar a inexistência de valor ou tamanho
     "emp": "emp",
 
@@ -143,7 +134,7 @@ tokens = {
     # Observações:
     #     Há somente comentários de linha completa
     "^(\\/3).*$": "comment",
-    
+
     # operators
 
     # Operador binário para soma algébrica entre dois números (num)
@@ -250,10 +241,9 @@ tokens = {
 
     # Operador binário para definicao de ranges. Recebe dois *num* e define
     # um range. Obs: este não retorna "operator" devido à dificuldade
-    # de diferenciação entre operadores na análise sintática 
+    # de diferenciação entre operadores na análise sintática
     # Utilização:
     #          0:1
     #           --> range de zero a um
     ":": ":"
 }
-
