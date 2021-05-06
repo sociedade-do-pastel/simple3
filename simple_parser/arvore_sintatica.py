@@ -1,16 +1,25 @@
-class AST:
-    pass
+from ABC import abc, abstractmethod
 
 
-class BinOp(AST):
+class Node(abc):
+    @abstractmethod
+    def solve(self):
+        pass
+
+    @abstractmethod
+    def __str__(self):
+        pass
+
+
+class BinOp(Node):
     '''
-    Essa classe representa uma operação binária na linguagem e herda de AST;
+    Essa classe representa uma operação binária na linguagem e herda de Node;
 
     Uma operação binária pode ser do tipo
     "+", "-", "*", "/", ":", "and", "orr", ">=", "<=", "==", "<", ">".
     '''
 
-    def __init__(self, left, token, right):
+    def __init__(self, left, operator, right):
         '''
         Construtor padrão da classe.
 
@@ -22,11 +31,16 @@ class BinOp(AST):
         '''
         self.left = left
         self.right = right
-        self.token = token
-        self.operator = token[0]  # operador
+        self.operator = operator
+
+    def solve(self):
+        pass
+
+    def __str__(self):
+        return f"{self.left} {self.operator} {self.right}"
 
 
-class UnOP(AST):
+class UnOP(Node):
     '''
     Essa classe cria um nó da árvore representando uma operação unária.
 
@@ -34,7 +48,7 @@ class UnOP(AST):
     "!" (negação).
     '''
 
-    def __init__(self, token, operand):
+    def __init__(self, operator, operand):
         '''
         Toda operação unária apresenta um único nó filho:
 
@@ -44,18 +58,44 @@ class UnOP(AST):
         operand -- operando da operação
 
         '''
-        self.token = token
-        self.operator = token[0]
+        self.operator = operator
         self.operand = operand
 
+    def solve(self):
+        pass
 
-class Num(AST):
-    pass
-
-
-class Str(AST):
-    pass
+    def __str__(self):
+        pass
 
 
-class Bool(AST):
-    pass
+class Num(Node):
+    def __init__(self, value):
+        self.value = value
+
+    def solve(self):
+        pass
+
+    def __str__(self):
+        return self.value
+
+
+class Str(Node):
+    def __init__(self, value):
+        self.value = value
+
+    def solve(self):
+        pass
+
+    def __str__(self):
+        return self.value
+
+
+class Bool(Node):
+    def __init__(self, value):
+        self.value = value
+
+    def solve(self):
+        pass
+
+    def __str__(self):
+        return self.value

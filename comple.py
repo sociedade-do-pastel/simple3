@@ -14,7 +14,7 @@ from simple_exceptions import exceptions
 # aqui virao os analisadores lexico e sintatico
 from lexer.simple_lexer import simple_lexer
 from lexer.lexer_exceptions import ErroLexer
-from simple_parser.parser import Parser
+from simple_parser.simple_parser import Parser
 
 
 def GetAsList(filename):
@@ -75,8 +75,9 @@ def main(argv):
         lexing_object.analise_lexica()
     except ErroLexer as LexErr:
         print(LexErr, sys.stderr)
+    lexing_object.flatten_token_list()
     try:
-        parsing_object = Parser(lexing_object, transpilar=False)
+        parsing_object = Parser(lexing_object.flattened_list)
         # parsing_object.init()
     except Exception as exx:
         print(exx)
