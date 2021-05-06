@@ -1,7 +1,7 @@
-from ABC import abc, abstractmethod
+from abc import ABC, abstractmethod
 
 
-class Node(abc):
+class Node(ABC):
     @abstractmethod
     def solve(self):
         pass
@@ -38,7 +38,7 @@ class BinOp(Node):
         pass
 
     def __str__(self):
-        return f"{self.left} {self.operator} {self.right}"
+        return f"( {self.left} {self.operator} {self.right} )"
 
 
 class UnOP(Node):

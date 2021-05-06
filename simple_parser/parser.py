@@ -37,45 +37,17 @@ class Parser():
         self.index = time
         self.current_token = self.token_list[self.index]
 
-    def check_eol(self):
-        if self.current_token is None:
-            # TODO se for montar árvore, aqui que tá o \n
-            if self.transpilar and self.code[-1] != '\n':
-                self.code += "\n"
-            self.current_token = self.next_token
-            self.code_line += 1
-            try:
-                self.next_token = self.lexer.get_next_token()
-            except Exception:
-                self.next_token = None
-
     # Isso aqui é o S dos não terminais
     def init(self):
-        d = ["EXPR", "DECVAR", "MATLAB", "FLUX", "RPT"]
-        func_list = [self.expr, self.decvar, self.matlab, self.flux, self.rpt]
-        chave = 0
+        func_list = [self.decvar, self.matlab, self.flux, self.rpt]
 
-        while True:
-            try:
-                func_list[chave]()
-                print(f'{d[chave]} validado!')
-                self.check_eol()
-                chave = 0
-            except IndexError:
-                if self.current_token is not None and self.next_token is not None:
-                    self.error(
-                        f"Erro na linha {self.code_line}: cadeia não reconhecida pela linguagem.")
+        for i in enumerate(func_list):
+            a = i[1]()
+            if a is not None:
+                print(a)
+                return a
 
-                if self.transpilar:
-                    print("\n\nOLHA O CÓDIGO EM PYTHON AI:")
-                    print(self.code, end="")
-                sys.exit()
-            except Exception as e:
-                if "interrupt" in e.args:
-                    self.error(
-                        f"Erro na linha {self.code_line}: cadeia não reconhecida pela linguagem.")
-                    sys.exit()
-                chave += 1
+        return None
 
     def decvar(self):
         pace = 0
@@ -108,11 +80,17 @@ class Parser():
     def literal(self):
         # str | MATLAB | BOOL
         if self.current_token[0] == "str":
-            return sinTree.Str(self.current_token[1])
-
-        a = self.matlab()
-        if a is not None:
+            a = sinTree.Str(self.current_token[1])
+            self.eat()
             return a
+        if self.current_token[0] == "num":
+            a = sinTree.Str(self.current_token[1])
+            self.eat()
+            return a
+
+        # a = self.matlab()
+        # if a is not None:
+        #     return a
 
         a = self.bool_ean()
         if a is not None:
@@ -192,62 +170,74 @@ class Parser():
         pass
 
     def expr(self):
-        # EXPR' OPBOOL EXPR' [(and|orr) EXPR'] | EXPR'
+        # EXPR' OPBOOL EXPR' [(and|orr) EXPR] | EXPR'
         # LITERAL | (EXPR)
 
         # EXPR'
-        if not self.__expr_2():
-            return False
+        expr1 = self.__expr_2()
+        if expr1 is None:
+            return None
 
-        if not self.current_token:
-            return True
+        checkpoint = self.index
 
-        # checkpoint
-        pos_temp = self.current_token_pos
+        # OPBOOL
+        op = self.opbool()
+        if op is None:
+            return expr1
 
-        # OPBOOL EXPR'
-        if not self.opbool():
-            return True
-        if not self.__expr_2():
-            self.rewind_to(pos_temp)
-            return True
+        # EXPR'
+        expr2 = self.__expr_2()
+        if expr2 is None:
+            self.rollback_to(checkpoint)
+            return expr1
+        else:
+            op.left = expr1
+            op.right = expr2
 
-        if not self.current_token:
-            return True
+        checkpoint = self.index
 
-        # checkpoint
-        pos_temp = self.current_token_pos
-
-        # [(and|orr) EXPR']
-        if self.current_token[0] in ("and", "orr"):
+        # (and|orr)
+        if self.current_token and self.current_token[1] in ("and", "orr"):
+            op2 = sinTree.BinOp(None, self.current_token[1], None)
             self.eat()
         else:
-            return True
-        if not self.__expr_2():
-            self.rewind_to(pos_temp)
-            return True
+            return op
+
+        # EXPR
+        expr3 = self.expr()
+        if expr3 is None:
+            self.rollback_to(checkpoint)
+            return op
+        else:
+            op2.left = op
+            op2.right = expr3
+            return op2
 
     def __expr_2(self):
         # LITERAL | (EXPR)
 
         # LITERAL
-        if self.literal():
-            return True
+        a = self.literal()
+        if a is None:
+            pass
+        else:
+            return a
 
-        # (EXPRR)
+        # (EXPR)
         if self.current_token[0] == "(":
-            pos_temp = self.current_token_pos
+            checkpoint = self.index
             self.eat()
-            if not self.expr():
-                return self.vomit(1)
-            if self.current_token[0] == ")":
+            a = self.expr()
+            if a is None:
+                self.vomit(1)
+                return None
+            elif self.current_token[0] == ")":
                 self.eat()
-                return True
+                return a
             else:
-                self.rewind_to(pos_temp)
-                return False
+                self.rollback_to(checkpoint)
 
-        return False
+        return None
 
     def opbool(self):
         tokens_aceitos = ("==", ">", ">=", "<", "<=")
