@@ -8,7 +8,7 @@ class Parser():
         self.index = 0
         self.current_token = self.token_list[self.index]
         self.code_line = 1
-        print(self.init(), end="")
+        self.bootstrap()
 
     def error(self, message=False):
         raise Exception(message if message else "deu merda")  # arrumar depois
@@ -36,6 +36,26 @@ class Parser():
         """
         self.index = time
         self.current_token = self.token_list[self.index]
+
+    def check_eol(self):
+        """
+            Checa se o token atual é None (identificador)
+            de fim de linha e, caso positivo, avança para 
+            o próximo token
+        """
+        if self.current_token is None:
+            self.eat()
+
+    def bootstrap(self):
+        """
+            Faz a inicialização do parsing
+        """
+        while True:
+            try:
+                print(self.init())
+                self.check_eol()
+            except:
+                return
 
     # Isso aqui é o S dos não terminais
     def init(self):
@@ -90,14 +110,14 @@ class Parser():
                               sinTree.Var(node_list[1]),
                               node_list[2])
 
-    def literal(self):
+    def literal(self, call_from_expr=False):
         # str | MATLAB | BOOL
         if self.current_token[0] == "str":
             tree_node = sinTree.Str(self.current_token[1])
             self.eat()
             return tree_node
 
-        a = self.matlab(consume_eos=False)
+        a = self.matlab(consume_eos=False, call_from_expr=call_from_expr)
         if a is not None:
             return a
 
@@ -116,7 +136,7 @@ class Parser():
         else:
             return None
 
-    def matlab(self, consume_eos=True):
+    def matlab(self, consume_eos=True, call_from_expr=False):
         # MATLAB   ->  MATLAB' (+ | -) MATLAB' [eos] | MATLAB'
         # MATLAB'  ->  MATLAB'' (* | / | ^) MATLAB'' [eos] | MATLAB''
         # MATLAB'' ->  num | var | '(' MATLAB ')'
@@ -130,7 +150,7 @@ class Parser():
             node = sinTree.BinOp(node, token[1], self.matlab1(consume_eos))
 
         # edge cases
-        if isinstance(node, sinTree.Var):
+        if call_from_expr == True and isinstance(node, sinTree.Var):
             self.error("erro no matlab")
 
         return node
