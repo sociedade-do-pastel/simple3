@@ -17,7 +17,7 @@ e compilar um arquivo fonte da *Simple3*.
 * Tokens e suas expressões regulares
 A seguir encontram-se relações de todos *tokens* presentes na linguagem,
 bem como as expressões regulares relacionadas à captura destes. Para
-maior informação quanto à utilização e significado de cada *token*,
+maiores informações quanto à utilização e significado de cada *token*,
 basta ler o conteúdo presente no arquivo =tokens.py= como mostrado no
 exemplo abaixo:
 
