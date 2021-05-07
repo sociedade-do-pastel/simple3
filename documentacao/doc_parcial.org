@@ -88,8 +88,8 @@ less tokens.py
 * Utilização do compilador
 Basta invocar o arquivo principal =comple.py= localizado na pasta raiz do
 projeto juntamente com a versão mais recente de *Python 3*. No caso, esta seria,
-também, a única dependência explicita do projeto. A sintaxe de uma compilação
-comum dá se por:
+também, a única dependência explícita do projeto. A sintaxe de uma compilação
+comum dá-se por:
 
 #+begin_src sh
   python comple.py alvo.sp3
