@@ -8,7 +8,7 @@
   str aaa = "AAAAAAAAAAAAAAAAAAAAAAAA";
   #+end_example
 
-  Note que, semelhantemente às linguagens derivadas da linguagem C, as diretivas
+  Note que, semelhante às linguagens derivadas da linguagem C, as diretivas
   sempre são terminadas com ponto e vírgula. 
   
   Este é um projeto para a matéria de *Compiladores* do curso de Ciência da
