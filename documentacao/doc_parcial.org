@@ -28,7 +28,7 @@ exemplo abaixo:
 ** Palavras-chave
 | *Keywords*  | Expressão regular | Observação                   |
 |-----------+-------------------+------------------------------|
-| /         | <                 |   <                          |
+| /         | <                 | <                            |
 | =tof=       | "tof"             |                              |
 | =ifi=       | "ifi"             |                              |
 | =els=       | "els"             |                              |
@@ -50,13 +50,13 @@ exemplo abaixo:
 
 ** Literais
 
-| Literais | Expressão regular   | Observação  |
-|----------+---------------------+-------------|
-| /        | <                   | <           |
-| =num=      | "[0-9]+(\.[0-9]+)?" |             |
-| =str=      | "\"[\wedge\"]*\""        |             |
-| =comment=  | "\wedge(\/3).*\dollar"         | linha única |
-|----------+---------------------+-------------|
+| Literais | Expressão regular      | Observação  |
+|----------+------------------------+-------------|
+| /        | <                      | <           |
+| =num=      | "[0-9]+(\.[0-9]+)?"    |             |
+| =str=      | "\"[\wedge\"]*\""      |             |
+| =comment=  | "\wedge(\/3).*\dollar" | linha única |
+|----------+------------------------+-------------|
 
 ** Identificadores
 
@@ -75,7 +75,7 @@ exemplo abaixo:
 | \(-\)      | "\-"              |                       |
 | \(*\)      | "\*"              |                       |
 | \(/\)      | "\/"              |                       |
-| \(\hat{}\) | "\wedge"               | exponenciação         |
+| \(\hat{}\) | "\wedge"          | exponenciação         |
 | \(>\)      | "\>"              |                       |
 | \(<\)      | "\<"              |                       |
 | \(>=\)     | "\>\="            |                       |
@@ -83,8 +83,6 @@ exemplo abaixo:
 | \(=\)      | "\="              |                       |
 | \(==\)     | "\=\="            |                       |
 | \(!\)      | "\!"              |                       |
-| =orr=        | "orr"             |                       |
-| =and=        | "and"             |                       |
 | \(:\)      | ":"               | operador de intervalo |
 |------------+-------------------+-----------------------|
 
@@ -159,4 +157,11 @@ O analisador sintático também produz uma *Árvore sintática abstrata* ou /abs
 
 pode auxiliar o usuário a entender melhor o que cada classe (cada /token/ numa hierarquia) representa na estrutura completa da árvore. 
 
+** Mudanças desde o início do projeto
+   
+   Desde o projeto inicial, ocorreram as seguintes mudanças:
 
+- =and= e =orr= :: Ambos operadores binários os quais podem ser representados por inúmeros =ifis=
+- =elf= :: ou =elif= no /Python/. Devido à possibilidade de se ter o mesmo comportamento com uma sequência (=els{ifi {num foo = 22;}}=), a equipe decidiu por excluir tal funcionalidade. 
+   
+Ambas mudanças se deram pela falta de tempo para a entrega do analisador sintático por completo. Porém, o grupo definiu a linguagem como suficientemente completa, além de simples. É importante relembrar que este é um dos objetivos da linguagem.

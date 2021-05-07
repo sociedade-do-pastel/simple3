@@ -2,6 +2,14 @@ from abc import ABC, abstractmethod
 
 
 class Node(ABC):
+    '''
+    Classe abstrata representante de cada nó da árvore,
+    seus métodos obrigatórios a serem implementados são:
+
+    solve -- soluciona a expressão válida na gramática através do Python.
+    __str__ -- apresenta a expressão baseada na estrutura dos nós filhos
+    na sintaxe da linguagem Python.
+    '''
     @abstractmethod
     def solve(self):
         pass
@@ -271,7 +279,18 @@ class Decvar(Node):
 
 
 class Whl(Node):
+    '''
+    Nó o qual representa uma estrutura de repetição whl (while/do).
+    Seu nó filho pode conter todas as estruturas do programa (S).
+    '''
+
     def __init__(self, expr, s):
+        '''
+        Argumentos:
+
+        expr -- expressão teste que induza a execução do laço
+        s -- não terminal inicial representando todas as partes da linguagem
+        '''
         self.expr = expr
         self.s = s
 
@@ -288,6 +307,11 @@ class Whl(Node):
 
 
 class For(Node):
+    '''
+    Semelhante ao whl, um laço for geralmente tem fim defindo (range).
+    Este nó representa essa estrutura.
+    '''
+
     def __init__(self, typo, var, rang, s):
         self.typo = typo
         self.var = var
