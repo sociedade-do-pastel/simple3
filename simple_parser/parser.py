@@ -1,13 +1,14 @@
 import sys
 from . import arvore_sintatica as sinTree
 
+
 class Parser():
     def __init__(self, token_list):
         self.token_list = token_list
         self.index = 0
         self.current_token = self.token_list[self.index]
         self.code_line = 1
-        self.init()
+        print(self.init(), end="")
 
     def error(self, message=False):
         raise Exception(message if message else "deu merda")  # arrumar depois
@@ -43,7 +44,6 @@ class Parser():
         for i in enumerate(func_list):
             a = i[1]()
             if a is not None:
-                print(a)
                 return a
 
         return None
@@ -74,19 +74,21 @@ class Parser():
                 pace += 1
             else:
                 self.rollback_to(index_backup)
+                return None
                 self.error("erro do decvar")
-        
+
         if len(node_list) < 3:
             self.rollback_to(index_backup)
             self.error("erro no decvar")
-        
+
         for node in node_list:
             if node is None:
                 self.rollback_to(index_backup)
                 self.error("erro no decvar")
 
-        return sinTree.Decvar(sinTree.Type(node_list[0]), sinTree.Var(node_list[1]), node_list[2])            
-                
+        return sinTree.Decvar(sinTree.Type(node_list[0]),
+                              sinTree.Var(node_list[1]),
+                              node_list[2])
 
     def literal(self):
         # str | MATLAB | BOOL
@@ -98,14 +100,6 @@ class Parser():
         a = self.matlab(consume_eos=False)
         if a is not None:
             return a
-        if self.current_token[0] == "num":
-            a = sinTree.Str(self.current_token[1])
-            self.eat()
-            return a
-
-        # a = self.matlab()
-        # if a is not None:
-        #     return a
 
         a = self.bool_ean()
         if a is not None:
@@ -171,7 +165,8 @@ class Parser():
         self.eat_generic("operador")
 
     def flux(self):
-        self.erro("erro no flux")
+        return None
+        self.error("erro no flux")
         pass
 
     def expr(self):
@@ -179,7 +174,7 @@ class Parser():
         # LITERAL | (EXPR)
 
         # EXPR'
-        expr1 = self.__expr_2()
+        expr1 = self.expr2()
         if expr1 is None:
             return None
 
@@ -191,7 +186,7 @@ class Parser():
             return expr1
 
         # EXPR'
-        expr2 = self.__expr_2()
+        expr2 = self.expr2()
         if expr2 is None:
             self.rollback_to(checkpoint)
             return expr1
@@ -218,7 +213,7 @@ class Parser():
             op2.right = expr3
             return op2
 
-    def __expr_2(self):
+    def expr2(self):
         # LITERAL | (EXPR)
 
         # LITERAL
@@ -254,11 +249,110 @@ class Parser():
             return None
 
     def rpt(self):
-        self.erro("erro no rpt")
-        pass
+        # whl (EXPR) scope_init S scope_end
+        # for [type] var '=' RANGE scope_init S scope_end
+
+        # whl (EXPR) scope_init S scope_end
+        a = self.rpt_whl()
+        if a is not None:
+            return a
+
+        # for [type] var '=' RANGE scope_init S scope_end
+        a = self.rpt_for()
+        if a is not None:
+            return a
+        return None
+
+    def rpt_whl(self):
+        # whl (EXPR) scope_init S scope_end
+
+        checkpoint = self.index
+
+        sequence = ("whl", "(", "EXPR", ")", "scope_init", "S", "scope_end")
+        for i in enumerate(sequence):
+            if i[0] == 2:
+                expr = self.expr()
+                if expr is None:
+                    break
+            elif i[0] == 5:
+                s = self.init()
+                if s is None:
+                    break
+            elif self.current_token[0] == i[1]:
+                self.eat()
+            else:
+                break
+        else:
+            return sinTree.Whl(expr, s)
+
+        self.rollback_to(checkpoint)
+        return None
+
+    def rpt_for(self):
+        # for [type] var '=' RANGE scope_init S scope_end
+
+        checkpoint = self.index
+
+        sequence = ("for", "type", "var", "=", "RANGE", "scope_init", "S",
+                    "scope_end")
+        for i in enumerate(sequence):
+            if i[0] == 1:
+                if self.current_token[0] == "type":
+                    typo = self.current_token[1]
+                    self.eat()
+            elif i[0] == 2:
+                if self.current_token[0] == "var":
+                    var = sinTree.Var(self.current_token[1])
+                    self.eat()
+                else:
+                    break
+            elif i[0] == 3:
+                if self.current_token[1] == "=":
+                    self.eat()
+            elif i[0] == 4:
+                rang = self.ranger()
+                if not rang:
+                    break
+            elif i[0] == 6:
+                s = self.init()
+                if not s:
+                    break
+            elif self.current_token[0] == i[1]:
+                self.eat()
+            else:
+                break
+        else:
+            return sinTree.For(typo, var, rang, s)
+
+        self.rollback_to(checkpoint)
+        return None
 
     def ranger(self):
-        pass
+        # num : num
+
+        # num
+        if self.current_token[0] == "num":
+            num1 = sinTree.Num(self.current_token[1])
+            self.eat()
+        else:
+            return None
+
+        # :
+        if self.current_token[1] == ":":
+            self.eat()
+        else:
+            self.vomit()
+            return None
+
+        # num
+        if self.current_token[0] == "num":
+            num2 = sinTree.Num(self.current_token[1])
+            self.eat()
+            return sinTree.BinOp(num1, ":", num2)
+        else:
+            self.vomit()
+            self.vomit()
+            return None
 
     def eat_generic(self, dic_string):
         '''

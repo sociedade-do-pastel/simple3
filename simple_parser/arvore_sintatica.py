@@ -38,7 +38,10 @@ class BinOp(Node):
         pass
 
     def __str__(self):
-        return f"( {self.left} {self.operator} {self.right} )"
+        if self.operator == ":":
+            return f"range({self.left}, {self.right})"
+        else:
+            return f"( {self.left} {self.operator} {self.right} )"
 
 
 class UnOP(Node):
@@ -208,7 +211,6 @@ class Var(Node):
         '''
         self.value = value
 
-
     def solve(self):
         pass
 
@@ -242,6 +244,7 @@ class Control(Node):
     def __str__(self):
         return self.value
 
+
 class Decvar(Node):
     def __init__(self, var_type, var, literal):
         '''
@@ -252,7 +255,7 @@ class Decvar(Node):
 
             var_type -- recebe uma instância da classe Type
             var -- recebe uma instância da classe Var
-            literal -- recebe uma instância da classe Num, Str ou Bool 
+            literal -- recebe uma instância da classe Num, Str ou Bool
         '''
         self.var_type = var_type
         self.var = var
@@ -262,4 +265,40 @@ class Decvar(Node):
         pass
 
     def __str__(self):
-        return f"{self.var_type} {self.var} = {self.literal}"
+        return f"{self.var} = {self.literal}"
+
+
+class Whl(Node):
+    def __init__(self, expr, s):
+        self.expr = expr
+        self.s = s
+
+    def solve(self):
+        pass
+
+    def __str__(self):
+        result = ""
+        for line in str(self.s).split("\n"):
+            if line == "":
+                continue
+            result += f"\t{line}\n"
+        return f"while {self.expr}:\n{result}"
+
+
+class For(Node):
+    def __init__(self, typo, var, rang, s):
+        self.typo = typo
+        self.var = var
+        self.rang = rang
+        self.s = s
+
+    def solve(self):
+        pass
+
+    def __str__(self):
+        result = ""
+        for line in str(self.s).split("\n"):
+            if line == "":
+                continue
+            result += f"\t{line}\n"
+        return f"for {self.var} in {self.rang}:\n{result}"
