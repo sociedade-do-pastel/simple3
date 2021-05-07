@@ -40,7 +40,7 @@ class Parser():
     def check_eol(self):
         """
             Checa se o token atual é None (identificador)
-            de fim de linha e, caso positivo, avança para 
+            de fim de linha e, caso positivo, avança para
             o próximo token
         """
         if self.current_token is None:
@@ -54,7 +54,7 @@ class Parser():
             try:
                 print(self.init())
                 self.check_eol()
-            except:
+            except Exception():
                 return
 
     # Isso aqui é o S dos não terminais
@@ -150,7 +150,7 @@ class Parser():
             node = sinTree.BinOp(node, token[1], self.matlab1(consume_eos))
 
         # edge cases
-        if call_from_expr == True and isinstance(node, sinTree.Var):
+        if call_from_expr is True and isinstance(node, sinTree.Var):
             self.error("erro no matlab")
 
         return node
