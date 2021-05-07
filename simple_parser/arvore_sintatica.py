@@ -40,6 +40,8 @@ class BinOp(Node):
     def __str__(self):
         if self.operator == ":":
             return f"range({self.left}, {self.right})"
+        elif self.operator == "^":
+            return f"( {self.left} ** {self.right} )"
         else:
             return f"( {self.left} {self.operator} {self.right} )"
 
