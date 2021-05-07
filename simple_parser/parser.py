@@ -160,14 +160,65 @@ class Parser():
             self.eat()
             return node
 
-    def operador(self):
-        # OPERADOR = + | - | / | * | ^
-        self.eat_generic("operador")
-
     def flux(self):
+        # ifi (EXPR) scope_init S scope_end
+        ifi = self.flux_ifi()
+        if ifi is None:
+            return None
+
+        if not self.current_token:
+            return ifi
+
+        els = self.flux_els()
+        if els is None:
+            return ifi
+        else:
+            ifi.els = els
+            return ifi
+
+    def flux_ifi(self):
+        # ifi (EXPR) scope_init S scope_end
+        checkpoint = self.index
+
+        sequence = ("ifi", "(", "EXPR", ")", "scope_init", "S", "scope_end")
+        for i in enumerate(sequence):
+            if i[0] == 2:
+                expr = self.expr()
+                if expr is None:
+                    break
+            elif i[0] == 5:
+                s = self.init()
+                if s is None:
+                    break
+            elif self.current_token[0] == i[1]:
+                self.eat()
+            else:
+                break
+        else:
+            return sinTree.Ifi(expr, s, None)
+
+        self.rollback_to(checkpoint)
         return None
-        self.error("erro no flux")
-        pass
+
+    def flux_els(self):
+        # els scope_init S scope_end
+        checkpoint = self.index
+
+        sequence = ("els", "scope_init", "S", "scope_end")
+        for i in enumerate(sequence):
+            if i[0] == 2:
+                s = self.init()
+                if s is None:
+                    break
+            elif self.current_token[0] == i[1]:
+                self.eat()
+            else:
+                break
+        else:
+            return sinTree.Els(s)
+
+        self.rollback_to(checkpoint)
+        return None
 
     def expr(self):
         # EXPR' OPBOOL EXPR' [(and|orr) EXPR] | EXPR'
@@ -181,6 +232,7 @@ class Parser():
         checkpoint = self.index
 
         # OPBOOL
+        print(self.current_token)
         op = self.opbool()
         if op is None:
             return expr1
@@ -353,12 +405,3 @@ class Parser():
             self.vomit()
             self.vomit()
             return None
-
-    def eat_generic(self, dic_string):
-        '''
-        Consome um token baseado na entrada presente no dicionário de tokens
-        por nível.
-        '''
-        for token_value in self.tokens_aceitos[dic_string]:
-            if token_value == self.current_token[1]:
-                self.eat(token_value)

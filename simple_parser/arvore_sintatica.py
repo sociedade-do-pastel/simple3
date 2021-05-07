@@ -302,3 +302,42 @@ class For(Node):
                 continue
             result += f"\t{line}\n"
         return f"for {self.var} in {self.rang}:\n{result}"
+
+
+class Ifi(Node):
+    def __init__(self, expr, s, els):
+        self.expr = expr
+        self.s = s
+        self.els = els
+
+    def solve(self):
+        pass
+
+    def __str__(self):
+        result = ""
+        if self.els is None:
+            els = ""
+        else:
+            els = str(self.els)
+
+        for line in str(self.s).split("\n"):
+            if line == "":
+                continue
+            result += f"\t{line}\n"
+        return f"if {self.expr}:\n{result}{els}"
+
+
+class Els(Node):
+    def __init__(self, s):
+        self.s = s
+
+    def solve(self):
+        pass
+
+    def __str__(self):
+        result = ""
+        for line in str(self.s).split("\n"):
+            if line == "":
+                continue
+            result += f"\t{line}\n"
+        return f"else:\n{result}"

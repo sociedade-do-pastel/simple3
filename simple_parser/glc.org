@@ -3,19 +3,20 @@
 #+startup: latexpreview
 #+attr_latex: \usepackage[margin=3cm]{geometry}
 
-*** Gramática Simple3
+* Gramática Simple3
 \begin{align*}
 S &\rightarrow \text{DECVAR | MATLAB | FLUX | RPT} \\
 \text{DECVAR} &\rightarrow \text{type var '=' LITERAL eos}\\
 \text{LITERAL} &\rightarrow \text{str | num | MATLAB | BOOL}\\
 \text{BOOL} &\rightarrow \text{tru | fls} \\
-\text{MATLAB} &\rightarrow \text{MATLAB OPERADOR MATLAB [eos] | num | ( MATLAB )} \\
+\text{MATLAB} &\rightarrow \text{MATLAB' (+ | -) MATLAB' [eos] | MATLAB'} \\
+\text{MATLAB'} &\rightarrow \text{MATLAB'' (* | / | \^{}) MATLAB'' [eos] | MATLAB''} \\
+\text{MATLAB''} &\rightarrow \text{num | var | '(' MATLAB ')'} \\
 \text{OPERADOR} &\rightarrow \text{+ | - | / | * | }\hat{}\\
 \text{FLUX} &\rightarrow \text{ifi (EXPR) scope\_init S scope\_end} \\
 \text{FLUX} &\rightarrow \text{ifi (EXPR) scope\_init S scope\_end els scope\_init S scope\_end} \\
-\text{FLUX} &\rightarrow \text{ifi (EXPR) scope\_init S scope\_end elf (EXPR) scope\_init S scope\_end} \\
-\text{FLUX} &\rightarrow \text{ifi (EXPR) scope\_init S scope\_end elf (EXPR) scope\_init S scope\_end els scope\_init S scope\_end} \\
-\text{EXPR} &\rightarrow \text{( EXPR ) OPBOOL ( EXPR ) [(and | orr) EXPR] | LITERAL} \\
+\text{EXPR} &\rightarrow \text{EXPR' OPBOOL EXPR' | EXPR'} \\
+\text{EXPR} &\rightarrow \text{LITERAL | (EXPR)} \\
 \text{OPBOOL} &\rightarrow \text{== | > | >= | < | <=} \\
 \text{RPT} &\rightarrow \text{whl ( EXPR ) scope\_init S scope\_end} \\
 \text{RPT} &\rightarrow \text{for [type] var '=' RANGE scope\_init S scope\_end} \\
