@@ -28,7 +28,6 @@
   exemplos e instruções de como utilizar o compilador.  Note que *até o momento,
   apenas é possível realizar a análise léxica*
 
-  
 * O andamento do projeto
   
 ** DONE Analisador léxico [6/6]
@@ -44,17 +43,17 @@
 
 ** TODO Analisador sintático [1/2]
    - [X] Definição da sintaxe da linguagem
-   - [ ] Implementação do analisador sintático recursivo descendente
-     - [ ] S
-     - [ ] DECVAR
-     - [ ] BOOL
-     - [ ] MATLAB
-     - [ ] OPERADOR
-     - [ ] FLUX
-     - [ ] EXPR
-     - [ ] OPBOOL
-     - [ ] RPT
-     - [ ] RANGE
+   - [-] Implementação do analisador sintático recursivo descendente
+     - [X] S
+     - [X] DECVAR
+     - [X] BOOL
+     - [X] MATLAB
+     - [X] OPERADOR
+     - [ ] FLUX (bugs faltantes)
+     - [X] EXPR 
+     - [X] OPBOOL
+     - [X] RPT
+     - [X] RANGE
      
 ** TODO Analisador semântico
   
