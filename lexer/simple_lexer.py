@@ -62,7 +62,6 @@ class simple_lexer:
                 continue
             for tokens in lines:
                 self.flattened_list.append(tokens)
-            self.flattened_list.append(None)
 
     def lista_p(self):
         # talvez utilize em mais de um lugar

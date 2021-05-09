@@ -4,9 +4,12 @@ num idd = ano - nas;
 
 num idx = 0;
 whl (idx < 100) {
+	for num idk = 1 : 10 {
+    	num idx = idx + 1;
+		num idx = idx + 1;
+	}
     num abc = 3;
+	num abc = 3;
 }
 
-for num idk = 1 : 10 {
-    idx = idx + 1;
-}
+

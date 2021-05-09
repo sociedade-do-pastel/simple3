@@ -8,6 +8,7 @@ class Parser():
         self.index = 0
         self.current_token = self.token_list[self.index]
         self.code_line = 1
+        self.do_loop = True
         self.bootstrap()
 
     def error(self, message=False):
@@ -18,7 +19,10 @@ class Parser():
             Avança para o próximo token
         """
         self.index += 1
-        self.current_token = self.token_list[self.index]
+        if self.index == len(self.token_list):
+            self.do_loop = False
+        else:
+            self.current_token = self.token_list[self.index]
 
     def vomit(self):
         """
@@ -50,11 +54,11 @@ class Parser():
         """
             Faz a inicialização do parsing
         """
-        while True:
+        while self.do_loop:
             try:
                 print(self.init())
-                self.check_eol()
-            except Exception():
+                # self.check_eol()
+            except:
                 return
 
     # Isso aqui é o S dos não terminais
@@ -110,14 +114,14 @@ class Parser():
                               sinTree.Var(node_list[1]),
                               node_list[2])
 
-    def literal(self, call_from_expr=False):
+    def literal(self):
         # str | MATLAB | BOOL
         if self.current_token[0] == "str":
             tree_node = sinTree.Str(self.current_token[1])
             self.eat()
             return tree_node
 
-        a = self.matlab(consume_eos=False, call_from_expr=call_from_expr)
+        a = self.matlab(consume_eos=False)
         if a is not None:
             return a
 
@@ -136,7 +140,7 @@ class Parser():
         else:
             return None
 
-    def matlab(self, consume_eos=True, call_from_expr=False):
+    def matlab(self, consume_eos=True):
         # MATLAB   ->  MATLAB' (+ | -) MATLAB' [eos] | MATLAB'
         # MATLAB'  ->  MATLAB'' (* | / | ^) MATLAB'' [eos] | MATLAB''
         # MATLAB'' ->  num | var | '(' MATLAB ')'
@@ -148,10 +152,6 @@ class Parser():
             if consume_eos and token == "eos":
                 self.eat()
             node = sinTree.BinOp(node, token[1], self.matlab1(consume_eos))
-
-        # edge cases
-        if call_from_expr is True and isinstance(node, sinTree.Var):
-            self.error("erro no matlab")
 
         return node
 
@@ -252,7 +252,6 @@ class Parser():
         checkpoint = self.index
 
         # OPBOOL
-        print(self.current_token)
         op = self.opbool()
         if op is None:
             return expr1
@@ -347,8 +346,10 @@ class Parser():
                 if expr is None:
                     break
             elif i[0] == 5:
-                s = self.init()
-                if s is None:
+                s = []
+                while self.current_token[0] != "scope_end":
+                    s.append(self.init())
+                if len(s) == 0:
                     break
             elif self.current_token[0] == i[1]:
                 self.eat()
@@ -386,8 +387,10 @@ class Parser():
                 if not rang:
                     break
             elif i[0] == 6:
-                s = self.init()
-                if not s:
+                s = []
+                while self.current_token[0] != "scope_end":
+                    s.append(self.init())
+                if len(s) == 0:
                     break
             elif self.current_token[0] == i[1]:
                 self.eat()

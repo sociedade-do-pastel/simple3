@@ -293,17 +293,21 @@ class Whl(Node):
         '''
         self.expr = expr
         self.s = s
+        self.tab = ""
+
+    def tabify(self):
+        self.tab += "\t"
 
     def solve(self):
         pass
 
     def __str__(self):
         result = ""
-        for line in str(self.s).split("\n"):
-            if line == "":
-                continue
-            result += f"\t{line}\n"
-        return f"while {self.expr}:\n{result}"
+        for line in self.s:
+            if isinstance(line, Whl) or isinstance(line, For):
+                line.tabify()
+            result += f"{self.tab}\t{line}\n"
+        return f"{self.tab}while {self.expr}:\n{result}"
 
 
 class For(Node):
@@ -317,16 +321,20 @@ class For(Node):
         self.var = var
         self.rang = rang
         self.s = s
+        self.tab = ""
+
+    def tabify(self):
+        self.tab += "\t"
 
     def solve(self):
         pass
 
     def __str__(self):
         result = ""
-        for line in str(self.s).split("\n"):
-            if line == "":
-                continue
-            result += f"\t{line}\n"
+        for line in self.s:
+            if isinstance(line, Whl) or isinstance(line, For):
+                line.tabify()
+            result += f"{self.tab}\t{line}\n"
         return f"for {self.var} in {self.rang}:\n{result}"
 
 
