@@ -304,7 +304,7 @@ class Whl(Node):
     def __str__(self):
         result = ""
         for line in self.s:
-            if isinstance(line, Whl) or isinstance(line, For):
+            if isinstance(line, (Whl, For, Ifi)):
                 line.tabify()
             result += f"{self.tab}\t{line}\n"
         return f"{self.tab}while {self.expr}:\n{result}"
@@ -332,7 +332,7 @@ class For(Node):
     def __str__(self):
         result = ""
         for line in self.s:
-            if isinstance(line, Whl) or isinstance(line, For):
+            if isinstance(line, (Whl, For, Ifi)):
                 line.tabify()
             result += f"{self.tab}\t{line}\n"
         return f"for {self.var} in {self.rang}:\n{result}"
@@ -343,6 +343,10 @@ class Ifi(Node):
         self.expr = expr
         self.s = s
         self.els = els
+        self.tab = ""
+
+    def tabify(self):
+        self.tab += "\t"
 
     def solve(self):
         pass
@@ -352,26 +356,32 @@ class Ifi(Node):
         if self.els is None:
             els = ""
         else:
+            self.els.tabify()
             els = str(self.els)
 
-        for line in str(self.s).split("\n"):
-            if line == "":
-                continue
-            result += f"\t{line}\n"
+        for line in self.s:
+            if isinstance(line, (Whl, For, Ifi, Els)):
+                line.tabify()
+            result += f"{self.tab}\t{line}\n"
         return f"if {self.expr}:\n{result}{els}"
 
 
 class Els(Node):
     def __init__(self, s):
         self.s = s
+        self.tab = ""
+
+    def tabify(self):
+        self.tab += "\t"
 
     def solve(self):
         pass
 
     def __str__(self):
         result = ""
-        for line in str(self.s).split("\n"):
-            if line == "":
-                continue
-            result += f"\t{line}\n"
-        return f"else:\n{result}"
+
+        for line in self.s:
+            if isinstance(line, (Whl, For, Ifi)):
+                line.tabify()
+            result += f"{self.tab}\t{line}\n"
+        return f"{self.tab}else:\n{result}"
