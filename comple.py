@@ -13,7 +13,8 @@ import sys
 from simple_exceptions import exceptions
 # aqui virao os analisadores lexico e sintatico
 from lexer.simple_lexer import simple_lexer
-# from parser import parser # same as before
+from lexer.lexer_exceptions import ErroLexer
+from simple_parser.parser import Parser
 
 
 def GetAsList(filename):
@@ -72,8 +73,15 @@ def main(argv):
     try:
         lexing_object = simple_lexer(alvo_comp)
         lexing_object.analise_lexica()
-    except exceptions.ErroLexer as LexErr:
+    except ErroLexer as LexErr:
         print(LexErr, sys.stderr)
+    lexing_object.flatten_token_list()
+    try:
+        parsing_object = Parser(lexing_object.flattened_list)
+        # parsing_object.init()
+    except Exception as exx:
+        print(exx)
+
     # TODO tratar filenames de saída customizáveis (necessário?)
     compiledFileSave(filename_to_save,
                      lexing_object, lex=True)

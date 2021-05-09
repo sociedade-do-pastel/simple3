@@ -1,7 +1,5 @@
-from simple_exceptions.exceptions import ErroLexer
+from .lexer_exceptions import ErroLexer
 from . import sym_table, afds
-import sys
-sys.path.append("..")
 
 
 class simple_lexer:
@@ -18,6 +16,8 @@ class simple_lexer:
         self.linhas = linhas_p_tratar
         self.tabela_simb = sym_table.SymbolsTable()
         self.tokens_reconhecidos = []
+        self.flattened_list = []
+        self.current_token_it = None
 
     def analise_lexica(self):
         '''
@@ -40,6 +40,29 @@ class simple_lexer:
     def get_tokens(self, linha_escolhida):
         return self.tokens_reconhecidos[linha_escolhida+1]
 
+    def get_next_token(self):
+        '''
+        Funciona como um singleton.
+        Itera =current_token_it= a cada vez que e chamado.
+        '''
+        if self.current_token_it is None:
+            self.current_token_it = iter(self.flattened_list)
+        return next(self.current_token_it)
+
+    def flatten_token_list(self):
+        '''
+        flatten_token_list gera uma lista "plana".
+        Uma vez que a simple3 funciona com
+        terminadores de diretiva ";", isso se torna possivel e, alem disso,
+        facilita o trabalho de gerar um token a seguir.
+
+        '''
+        for lines in self.tokens_reconhecidos:
+            if lines is None:
+                continue
+            for tokens in lines:
+                self.flattened_list.append(tokens)
+
     def lista_p(self):
         # talvez utilize em mais de um lugar
         return isinstance(self.linhas, list)
@@ -60,7 +83,6 @@ class simple_lexer:
         p1 = 0                  # ponteiro para o início da substring
         p2 = 0                  # ponteiro para o final da substring
         num_temp = ''
-        num_received = False
 
         while (p1 < tamanho_linha and p2 < tamanho_linha):
 
@@ -78,31 +100,35 @@ class simple_lexer:
             # salva o token encontrado e prossegue lendo em um range maior;
             # quando não for mais um número encontrado, esse último estado
             # salvo é o maior número encontrado
-            if num_received:
-                # um número terminado em ponto não é reconhecido, ignorar
-                if uma_linha[p2-1] == '.':
-                    continue
-                # atualiza o estado de num encontrado
-                elif result and result[0] == 'num':
-                    num_temp = result
-                    continue
-                # parou de receber num em range maior
-                else:
-                    num_received = False
-                    lista_tokens.append(num_temp)
-                    self.__add_to_symTable(num_temp)
-                    p2 -= 1
-                    p1 = p2
 
             # token encontrado
             if result:
+                if result[1] in ("<", ">", "="):
+                    test = afds.categorizar_lex(uma_linha[p1:p2+1])
+                    if test:
+                        p2 += 1
+                        result = test
+
                 if result[0] == 'num':
-                    num_temp = result
-                    num_received = True
-                else:
-                    lista_tokens.append(result)
-                    self.__add_to_symTable(result)
-                    p1 = p2
+                    i = 0
+                    while (p2 + i < tamanho_linha):
+                        num_temp = afds.categorizar_lex(uma_linha[p1:p2+1+i])
+                        if uma_linha[p2-1+i] == '.':
+                            i += 1
+                            continue
+
+                        if num_temp:
+                            result = num_temp
+                            i += 1
+                            if p2 + i >= tamanho_linha:
+                                p2 += i
+                        else:
+                            p2 += i
+                            break
+
+                lista_tokens.append(result)
+                self.__add_to_symTable(result)
+                p1 = p2
 
         # se p1 for diferente de p2 significa que a linha foi finalizada com um
         # bloco não reconhecido, portanto, não aceita

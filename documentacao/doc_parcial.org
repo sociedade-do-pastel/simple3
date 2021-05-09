@@ -1,5 +1,5 @@
-#+title: A linguagem de programação Simple3
-#+options: date:nil author:nil toc:nil
+#+OPTIONS: date:nil author:nil toc:nil
+#+TITLE: A linguagem de programação Simple3
 #+latex_header: \usepackage{indentfirst}
 #+latex_header: \usepackage[margin=2cm]{geometry}
 #+latex_header: \usepackage[utf8]{inputenc}
@@ -7,6 +7,7 @@
 #+latex_header: \author{{Bellini, Leon F.}\\{\small 22218002-8} \and {Sampaio, Guilherme O.}\\{\small 22218007-7} \and {Barbosa, Pedro F. M.}\\{\small 22218013-5} \and {de Sousa, Felipe M.}\\{\small 22218042-4}}
 
 * Introdução
+  
 Fanáticos por minimalismo e simplicidade cravam por uma linguagem
 desenvolvida como a *Simple3*, na qual o limite de três caracteres em
 todas as palavras-chave permite a criação de arquivos fonte com
@@ -15,19 +16,19 @@ seção [[* Utilização do compilador]] para as instruções de como programar
 e compilar um arquivo fonte da *Simple3*.
 
 * Tokens e suas expressões regulares
+  
 A seguir encontram-se relações de todos *tokens* presentes na linguagem,
 bem como as expressões regulares relacionadas à captura destes. Para
 maiores informações quanto à utilização e significado de cada *token*,
 basta ler o conteúdo presente no arquivo =tokens.py= como mostrado no
 exemplo abaixo:
 
-#+begin_src sh
-less tokens.py 
-#+end_src
+  : less tokens.py 
 
 ** Palavras-chave
 | *Keywords*  | Expressão regular | Observação                   |
 |-----------+-------------------+------------------------------|
+| /         | <                 | <                            |
 | =tof=       | "tof"             |                              |
 | =ifi=       | "ifi"             |                              |
 | =els=       | "els"             |                              |
@@ -38,7 +39,6 @@ less tokens.py
 | =num=       | "num"             |                              |
 | =brk=       | "brk"             |                              |
 | =jmp=       | "jmp"             |                              |
-| =ret=       | "ret"             |                              |
 | {...}     | "\ {" e "\ }"     | definição de escopo          |
 | \([...]\) | "\ [" e "\ ]"     | acesso ou definição de vetor |
 | (...)     | "\ (" e "\ )"     |                              |
@@ -50,16 +50,19 @@ less tokens.py
 
 ** Literais
 
-| Identificadores | Expressão regular   | Observação  |
-|-----------------+---------------------+-------------|
-| =num=             | "[0-9]+(\.[0-9]+)?" |             |
-| =str=             | "\"[\wedge\"]*\""        |             |
-| =comment=         | "\wedge(\/3).*\dollar"         | linha única |
-|-----------------+---------------------+-------------|
+| Literais | Expressão regular      | Observação  |
+|----------+------------------------+-------------|
+| /        | <                      | <           |
+| =num=      | "[0-9]+(\.[0-9]+)?"    |             |
+| =str=      | "\"[\wedge\"]*\""      |             |
+| =comment=  | "\wedge(\/3).*\dollar" | linha única |
+|----------+------------------------+-------------|
 
 ** Identificadores
+
 | Identificadores | Expressão regular | Observação         |
 |-----------------+-------------------+--------------------|
+| /               | <                 | <                  |
 | =var=             | "[A-z]{3}"        | apenas três letras |
 |-----------------+-------------------+--------------------|
 
@@ -67,11 +70,12 @@ less tokens.py
 
 | Operador   | Expressão regular | Observação            |
 |------------+-------------------+-----------------------|
+| /          | <                 | <                     |
 | \(+\)      | "\+"              |                       |
 | \(-\)      | "\-"              |                       |
 | \(*\)      | "\*"              |                       |
 | \(/\)      | "\/"              |                       |
-| \(\hat{}\) | "\wedge"               | exponenciação         |
+| \(\hat{}\) | "\wedge"          | exponenciação         |
 | \(>\)      | "\>"              |                       |
 | \(<\)      | "\<"              |                       |
 | \(>=\)     | "\>\="            |                       |
@@ -79,59 +83,85 @@ less tokens.py
 | \(=\)      | "\="              |                       |
 | \(==\)     | "\=\="            |                       |
 | \(!\)      | "\!"              |                       |
-| =orr=        | "orr"             |                       |
-| =and=        | "and"             |                       |
 | \(:\)      | ":"               | operador de intervalo |
 |------------+-------------------+-----------------------|
 
-
 * Utilização do compilador
+
 Basta invocar o arquivo principal =comple.py= localizado na pasta raiz do
 projeto juntamente com a versão mais recente de *Python 3*. No caso, esta seria,
 também, a única dependência explícita do projeto. A sintaxe de uma compilação
 comum dá-se por:
 
 #+begin_src sh
-  python comple.py alvo.sp3
+python comple.py alvo.sp3
 #+end_src
 
 Note que a extensão do arquivo deve conter, necessariamente, o sufixo
 =.sp3=. Qualquer outro arquivo será negado pelo compilador. O executável
-de saída após a compilação tem o nome fixo =output.py= (no momento
-=output.txt=). Além disso, devido à dificuldades relacionadas à variável de *PATH*, é
-recomendado que o /script/ seja executado na pasta raiz do projeto. 
-
-** Particularidades do analisador léxico
-   Trata-se de um componente que executa uma única passagem. Caso seja
-desejado trabalhar com sua classe, =simple_lexer=, o método =get_token= é
-disponibilizado para aqueles que tenham interesse em saber qual /token/
-foi reconhecido em determinada linha *x*. Devido à natureza de analisadores
-léxicos de passagem única, não foi implementado um método =get_next_token=.
+de saída após a compilação tem o nome fixo =output.py=.
 
 #+latex: \clearpage
-** Exemplo de arquivo fonte
-Um arquivo fonte da *Simple3* tem estrutura semelhante ao exemplo a
+
+** Exemplo(s) de arquivo fonte
+
+Um arquivo fonte da *Simple3* tem estrutura semelhante ao(s) exemplo(s) a
 seguir:
-#+include: ./arquivo_teste.sp3 example
 
-** Output
-   No momento, apenas a fase de *análise léxica* apresenta-se como
-completa.  Por esse motivo, o arquivo =output.txt= o qual aparece na
-pasta raiz tem como função de mostrar todos os tokens reconhecidos
-durante a última execução. Este mostrará uma relação de todos os
-/tokens/ encontrados em uma linha além de, ao fim, imprimir a tabela de
-símbolos.
+*** Descobrir idade e demo para estruturas para /loop/
 
-A saída tem como formato:
+ #+include: "arquivo_teste.sp3" src fundamental
+
+*** Converter de graus célsius para graus fahrenheit
+
+ #+include: "arquivo_teste2.sp3" src fundamental
+
+*** Converter de kmh/ms ou vice-versa
+
+ #+include: "arquivo_teste3.sp3" src fundamental
+
+* Estrutura do compilador
+  
+  A seguir serão detalhados os processos de funcionamento e saída dos processos de compilação, os analisadores léxico, sintático e semântico. Note que, *os analisadores em si não produzem saída além do arquivo compilado final*, uma vez que estes são classes cujos membros são as variáveis relevantes para o programador que deseje as utilizar, no caso, para imprimir de maneira propriamente dita o resultado de algum passo que não seja tal arquivo final, o usuário *DEVE* modificar o arquivo fonte, que se apresenta bem documentado. 
+
+** O analisador léxico
+
+A lista produzida  tem como formato:
 
 #+begin_example
-Linha x: (<tipo>, <valor>, escopo)
-
-Tabela de simbolos
-<valores da tabela>
-...
+[[(<tipo>, <valor>, escopo), (<tipo>, <valor>, escopo),...]]
 #+end_example
 
 Na qual =escopo= tem valor de 0 (global) a 1 (local). Note que uma variável
 nomeada pode aparecer em mais de um local, a priorização, entretanto, será
 tratada em fases posteriores.
+
+O objeto =lexer= criado (se houver sucesso) é repassado como argumento para o construtor do passo a seguir, [[O analisador sintático]], alguns membros da classe os quais podem ser de interesse são:
+
+- =tokens_reconhecidos= :: *todos* os /tokens/ reconhecidos, cada um destes sendo um índice de uma *sub-lista*, cada *sub-lista* representando uma linha do arquivo fonte. 
+- =flattened_list= :: A lista de /tokens/ apresentada anteriormente na forma *flat*, ou seja, não apresenta estrutura matricial, =None= simbolizando novas linhas. 
+
+Além disso, o método =get_next_token= prova-se útil durante a fase de *análise sintática* ao iterar sobre a =flattened_list= e manter em "cache" o /token/ a seguir. 
+
+** O analisador sintático
+   
+   Assim que inicializado, o analisador sintático mantém em memória o /token/ atual (=current_token=) e o seguinte. Desta forma, é possível iterar sobre a =flattened_list= e manter, ao mesmo tempo, uma forma de /lookahead/. 
+
+A estrutura do /parser/ foi baseada na gramática livre de contexto definida a seguir, note que, para cada símbolo terminal é definida uma função para implementação por meio da "técnica" de /parsing/ recursiva descendente. 
+   
+#+INCLUDE: "../simple_parser/glc.org"
+
+O analisador sintático também produz uma *Árvore sintática abstrata* ou /abstract syntax tree/ do inglês, sua classe podendo ser encontrada na pasta =simple_parser= com o nome =arvore_sintatica=. Um simples 
+
+  : help(<no_da_arvore>) 
+
+pode auxiliar o usuário a entender melhor o que cada classe (cada /token/ numa hierarquia) representa na estrutura completa da árvore. 
+
+** Mudanças desde o início do projeto
+   
+   Desde o projeto inicial, ocorreram as seguintes mudanças:
+
+- =and= e =orr= :: Ambos operadores binários os quais podem ser representados por inúmeros =ifis=
+- =elf= :: ou =elif= no /Python/. Devido à possibilidade de se ter o mesmo comportamento com uma sequência (=els{ifi {num foo = 22;}}=), a equipe decidiu por excluir tal funcionalidade. 
+   
+Ambas mudanças se deram pela falta de tempo para a entrega do analisador sintático por completo. Porém, o grupo definiu a linguagem como suficientemente completa, além de simples. É importante relembrar que este é um dos objetivos da linguagem.

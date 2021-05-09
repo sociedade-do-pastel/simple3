@@ -15,7 +15,7 @@ reservados = {
     "elf": ("elf", "elf"),
     "els": ("els", "els"),
     "emp": ("emp", "emp"),
-    "tof": ("tof", "tof"),
+    "tof": ("type", "tof"),
     "whl": ("whl", "whl"),
     "brk": ("brk", "brk"),
     "for": ("for", "for"),
