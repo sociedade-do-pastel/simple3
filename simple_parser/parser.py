@@ -207,8 +207,10 @@ class Parser():
                 if expr is None:
                     break
             elif i[0] == 5:
-                s = self.init()
-                if s is None:
+                s = []
+                while self.current_token[0] != "scope_end":
+                    s.append(self.init())
+                if len(s) == 0:
                     break
             elif self.current_token[0] == i[1]:
                 self.eat()
@@ -227,8 +229,10 @@ class Parser():
         sequence = ("els", "scope_init", "S", "scope_end")
         for i in enumerate(sequence):
             if i[0] == 2:
-                s = self.init()
-                if s is None:
+                s = []
+                while self.current_token[0] != "scope_end":
+                    s.append(self.init())
+                if len(s) == 0:
                     break
             elif self.current_token[0] == i[1]:
                 self.eat()

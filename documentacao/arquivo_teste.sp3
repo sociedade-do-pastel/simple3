@@ -10,6 +10,14 @@ whl (idx < 100) {
 	}
     num abc = 3;
 	num abc = 3;
-}
 
+	ifi ( abc < 4) {
+	   num abc = 3;
+	   num ano = 2021;
+    }
+	els {
+		num abc = 5;
+		num ano = 2022;
+    }
+}
 
