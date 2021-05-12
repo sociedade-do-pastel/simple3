@@ -1,5 +1,6 @@
 #+title: Simple3: O compilador para a linguagem smp assim
 * O projeto
+
   *Simple3*, como seu nome já diz, tem como foco o minimalismo de seus arquivos
   fontes, a declaração de uma variável do tipo numérico pode ser dada por:
 
@@ -15,22 +16,24 @@
   Computação do Centro Universitário FEI.
   
 * Membros
+
   | Nome                            |         RA |
   |---------------------------------+------------|
   | Leon Ferreira Bellini           | 22218002-8 |
-  | Pedro Freitas Magalhães Barbosa | 22218007-7 |
-  | Felipe Maciel de Sousa          | 22218013-5 |
-  | Guilherme Ormond Sampaio        | 22218042-4 |
+  | Pedro Freitas Magalhães Barbosa | 22218013-5 |
+  | Felipe Maciel de Sousa          | 22218042-4 |
+  | Guilherme Ormond Sampaio        | 22218007-7 |
   |---------------------------------+------------|
 
 * Como utilizar o compilador
+
   Consulte o arquivo contido na pasta =documentacao=, [[file:documentacao/doc_parcial.org][doc_parcial]]. Este contém
-  exemplos e instruções de como utilizar o compilador.  Note que *até o momento,
-  apenas é possível realizar a análise léxica*
+  exemplos e instruções de como utilizar o compilador. 
 
 * O andamento do projeto
   
 ** DONE Analisador léxico [6/6]
+
     - [X] Definição dos /tokens/ da linguagem
     - [X] Definição da tabela de símbolos
     - [X] Construção dos autômatos
@@ -41,19 +44,20 @@
     - [X] Tratamento de comentários e linhas vazias
     - [X] Tratamento de erros e casos especiais
 
-** TODO Analisador sintático [1/2]
+** DONE Analisador sintático [2/2]
+
    - [X] Definição da sintaxe da linguagem
-   - [-] Implementação do analisador sintático recursivo descendente
+   - [X] Implementação do analisador sintático recursivo descendente
      - [X] S
      - [X] DECVAR
      - [X] BOOL
      - [X] MATLAB
      - [X] OPERADOR
-     - [ ] FLUX (bugs faltantes)
+     - [X] FLUX 
      - [X] EXPR 
      - [X] OPBOOL
      - [X] RPT
      - [X] RANGE
      
 ** TODO Analisador semântico
-  
+
