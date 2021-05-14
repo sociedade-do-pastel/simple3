@@ -24,8 +24,8 @@ class BinOp(Node):
     Essa classe representa uma operação binária na linguagem e herda de Node;
 
     Uma operação binária pode ser do tipo
-    "+", "-", "*", "/", ":", "and", "orr",
-    ">=", "<=", "==", "<", ">", "^" e ":".
+    "+", "-", "*", "/", ":", "^", ":",
+    ">=", "<=", "==", "<" e ">".
     '''
 
     def __init__(self, left, operator, right):
@@ -43,7 +43,11 @@ class BinOp(Node):
         self.operator = operator
 
     def solve(self):
-        pass
+        if self.operator in ("+", "-", "*", "/", "^", ":", ">=", "<=", ">", "<"):
+            if not isinstance(self.left, Num) or not isinstance(self.right, Num):
+                raise Exception(f"Erro semântico: operação {self.operator} só pode ser feitas com dois números")
+        elif self.operator == "==" and self.left.solve() != self.right.solve():
+            raise Exception(f"Erro semântico: operação {self.operator} só pode ser feitas com dois tipos iguais")
 
     def __str__(self):
         if self.operator == ":":
@@ -103,7 +107,7 @@ class Num(Node):
         self.value = value
 
     def solve(self):
-        pass
+        return Num
 
     def __str__(self):
         return self.value
@@ -126,7 +130,7 @@ class Str(Node):
         self.value = value
 
     def solve(self):
-        pass
+        return Str
 
     def __str__(self):
         return self.value
@@ -148,7 +152,7 @@ class Bool(Node):
         self.value = value
 
     def solve(self):
-        pass
+        return Bool
 
     def __str__(self):
         return self.value
@@ -272,7 +276,12 @@ class Decvar(Node):
         self.literal = literal
 
     def solve(self):
-        pass
+        if self.var_type.value == "num" and not isinstance(self.var_type, Num):
+            raise Exception(f"Erro semântico: {self.literal} não pode ser declarado como {self.var_type}")
+        elif self.var_type.value == "str" and not isinstance(self.var_type, Str):
+            raise Exception(f"Erro semântico: {self.literal} não pode ser declarado como {self.var_type}")
+        elif self.var_type.value == "tof" and not isinstance(self.var_type, Bool):
+            raise Exception(f"Erro semântico: {self.literal} não pode ser declarado como {self.var_type}")
 
     def __str__(self):
         return f"{self.var} = {self.literal}"
