@@ -43,11 +43,24 @@ class BinOp(Node):
         self.operator = operator
 
     def solve(self):
-        if self.operator in ("+", "-", "*", "/", "^", ":", ">=", "<=", ">", "<"):
-            if not isinstance(self.left, Num) or not isinstance(self.right, Num):
-                raise Exception(f"Erro semântico: operação {self.operator} só pode ser feitas com dois números")
-        elif self.operator == "==" and self.left.solve() != self.right.solve():
-            raise Exception(f"Erro semântico: operação {self.operator} só pode ser feitas com dois tipos iguais")
+        esquerda = self.left.solve()
+        direita = self.right.solve()
+
+        if self.operator in ("+", "-", "*", "/", "^",
+                             ":", ">=", "<=", ">", "<"):
+            if not isinstance(esquerda, Num) or not isinstance(direita, Num):
+                raise Exception(
+                    f"Erro semântico: operação {self.operator} só pode ser feitas com dois números")
+            return Num(0)
+        elif self.operator == "==":
+            if isinstance(esquerda, Var) or isinstance(direita, Var):
+                if isinstance(esquerda.value, type(direita.value)):
+                    return esquerda
+            elif isinstance(esquerda, type(direita)):
+                return esquerda
+
+            raise Exception(
+                f"Erro semântico: operação {self.operator} só pode ser feitas com dois tipos iguais")
 
     def __str__(self):
         if self.operator == ":":
@@ -107,7 +120,7 @@ class Num(Node):
         self.value = value
 
     def solve(self):
-        return Num
+        return self
 
     def __str__(self):
         return self.value
@@ -130,7 +143,7 @@ class Str(Node):
         self.value = value
 
     def solve(self):
-        return Str
+        return self
 
     def __str__(self):
         return self.value
@@ -152,7 +165,7 @@ class Bool(Node):
         self.value = value
 
     def solve(self):
-        return Bool
+        return self
 
     def __str__(self):
         return self.value
@@ -175,7 +188,7 @@ class Emp(Node):
         self.value = value
 
     def solve(self):
-        pass
+        return self
 
     def __str__(self):
         return self.value
@@ -200,7 +213,7 @@ class Type(Node):
         self.value = value
 
     def solve(self):
-        pass
+        return self
 
     def __str__(self):
         return self.value
@@ -226,7 +239,7 @@ class Var(Node):
         self.value = value
 
     def solve(self):
-        pass
+        return self
 
     def __str__(self):
         return self.value
@@ -253,7 +266,7 @@ class Control(Node):
         self.value = value
 
     def solve(self):
-        pass
+        return self
 
     def __str__(self):
         return self.value
@@ -276,14 +289,21 @@ class Decvar(Node):
         self.literal = literal
 
     def solve(self):
-        if self.var_type.value == "num" and not isinstance(self.var_type, Num):
-            raise Exception(f"Erro semântico: {self.literal} não pode ser declarado como {self.var_type}")
-        elif self.var_type.value == "str" and not isinstance(self.var_type, Str):
-            raise Exception(f"Erro semântico: {self.literal} não pode ser declarado como {self.var_type}")
-        elif self.var_type.value == "tof" and not isinstance(self.var_type, Bool):
-            raise Exception(f"Erro semântico: {self.literal} não pode ser declarado como {self.var_type}")
+        literal_temp = self.literal
+        if isinstance(self.literal, BinOp):
+            literal_temp = self.literal.solve()
 
-    def __str__(self):
+        if self.var_type.value == "num" and not isinstance(literal_temp, Num):
+            raise Exception(
+                f"Erro semântico: {self.literal} não pode ser declarado como num")
+        elif self.var_type.value == "str" and not isinstance(literal_temp, Str):
+            raise Exception(
+                f"Erro semântico: {self.literal} não pode ser declarado como str")
+        elif self.var_type.value == "tof" and not isinstance(literal_temp, Bool):
+            raise Exception(
+                f"Erro semântico: {self.literal} não pode ser declarado como tof")
+
+    def str(self):
         return f"{self.var} = {self.literal}"
 
 
@@ -358,7 +378,12 @@ class Ifi(Node):
         self.tab += "\t"
 
     def solve(self):
-        pass
+        print("entrou aqui")
+        self.expr.solve()
+        for line in self.s:
+            line.solve()
+
+        self.els.solve()
 
     def __str__(self):
         result = ""
@@ -384,7 +409,8 @@ class Els(Node):
         self.tab += "\t"
 
     def solve(self):
-        pass
+        for line in self.s:
+            line.solve()
 
     def __str__(self):
         result = ""

@@ -9,7 +9,9 @@ class Parser():
         self.current_token = self.token_list[self.index]
         self.code_line = 1
         self.do_loop = True
+        self.treeList = []
         self.bootstrap()
+        self.solveIter()
 
     def error(self, message=False):
         raise Exception(message if message else "deu merda")  # arrumar depois
@@ -56,10 +58,19 @@ class Parser():
         """
         while self.do_loop:
             try:
-                print(self.init())
-                # self.check_eol()
+                self.treeList.append(self.init())
             except:
                 return
+
+    def solveIter(self):
+        """
+            Chama iterativamente as funções solve
+        """
+        try:
+            for i in self.treeList:
+                i.solve()
+        except Exception as e:
+            print(e)
 
     # Isso aqui é o S dos não terminais
     def init(self):
@@ -170,7 +181,7 @@ class Parser():
 
         if token[0] == "num":
             self.eat()
-            return sinTree.Str(token[1])
+            return sinTree.Num(token[1])
         elif token[0] == "var":
             self.eat()
             return sinTree.Var(token[1])
