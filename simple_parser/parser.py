@@ -21,7 +21,7 @@ class Parser():
             Avança para o próximo token
         """
         self.index += 1
-        if self.index == len(self.token_list):
+        if self.index >= len(self.token_list):
             self.do_loop = False
         else:
             self.current_token = self.token_list[self.index]
@@ -59,7 +59,8 @@ class Parser():
         while self.do_loop:
             try:
                 self.treeList.append(self.init())
-            except:
+            except Exception as e:
+                print(e)
                 return
 
     def solveIter(self):
@@ -74,25 +75,28 @@ class Parser():
 
     # Isso aqui é o S dos não terminais
     def init(self):
-        func_list = [self.decvar, self.matlab, self.flux, self.rpt]
+        func_list = [self.decvar, self.matlab, self.flux, self.rpt,
+                     self.control]
 
         for i in enumerate(func_list):
             a = i[1]()
             if a is not None:
                 return a
 
-        return None
+        self.error(f"Erro no parser: sentença não reconhecida com {self.current_token[1]}")
 
     def decvar(self):
         pace = 0
         index_backup = self.index
         node_list = []
+        is_decvar = False
 
         while pace < 5:
             if self.current_token[0] == "type" and pace == 0:
                 node_list.append(self.current_token[1])
                 self.eat()
                 pace += 1
+                is_decvar = True
             elif self.current_token[0] == "var" and pace == 1:
                 node_list.append(self.current_token[1])
                 self.eat()
@@ -107,10 +111,10 @@ class Parser():
             elif self.current_token[0] == "eos" and pace == 4:
                 self.eat()
                 pace += 1
+            elif is_decvar:
+                self.error("Erro no parser: decvar incompleto")
             else:
-                self.rollback_to(index_backup)
                 return None
-                self.error("erro do decvar")
 
         if len(node_list) < 3:
             self.rollback_to(index_backup)
@@ -152,31 +156,57 @@ class Parser():
             return None
 
     def matlab(self, consume_eos=True):
-        # MATLAB   ->  MATLAB' (+ | -) MATLAB' [eos] | MATLAB'
+        # MATLAB   ->  MATLAB' (+ | -) MATLAB' [eos] | MATLAB' [eos]
         # MATLAB'  ->  MATLAB'' (* | / | ^) MATLAB'' [eos] | MATLAB''
         # MATLAB'' ->  num | var | '(' MATLAB ')'
-        node = self.matlab1(consume_eos)
+        node1 = self.matlab1(consume_eos)
 
-        while self.current_token[1] in ('+', '-'):
+        if not node1:
+            return None
+
+        if self.current_token and self.current_token[1] in ('+', '-'):
             token = self.current_token
             self.eat()
-            if consume_eos and token == "eos":
-                self.eat()
-            node = sinTree.BinOp(node, token[1], self.matlab1(consume_eos))
+        elif consume_eos and self.current_token and self.current_token[0] == "eos":
+            self.eat()
+            return node1
+        else:
+            return node1
 
-        return node
+        node2 = self.matlab1(consume_eos)
+        if not node2:
+            self.error("Erro no parser: operação matlab incompleta")
+
+        if consume_eos and self.current_token and self.current_token[0] == "eos":
+            self.eat()
+
+        return sinTree.BinOp(node1, token[1], node2)
 
     def matlab1(self, consume_eos=True):
-        node = self.matlab2(consume_eos)
+        """MATLAB'  ->  MATLAB'' (* | / | ^) MATLAB'' [eos] | MATLAB''."""
+        node1 = self.matlab2(consume_eos)
 
-        while self.current_token[1] in ('*', '/', '^'):
+        if not node1:
+            return None
+
+        if self.current_token[1] in ('*', '/', '^'):
             token = self.current_token
             self.eat()
-            node = sinTree.BinOp(node, token[1], self.matlab2(consume_eos))
+        else:
+            return node1
 
-        return node
+        node2 = self.matlab2(consume_eos)
+
+        if not node2:
+            self.error("Erro no parser: operação matlab incompleta")
+
+        if consume_eos and self.current_token and self.current_token[0] == "eos":
+            self.eat()
+
+        return sinTree.BinOp(node1, token[1], node2)
 
     def matlab2(self, consume_eos=True):
+        """MATLAB'' ->  num | var | '(' MATLAB ')'."""
         token = self.current_token
 
         if token[0] == "num":
@@ -188,8 +218,11 @@ class Parser():
         elif token[0] == "(":
             self.eat()
             node = self.matlab(consume_eos)
-            self.eat()
-            return node
+            if self.current_token[0] == ')':
+                self.eat()
+                return node
+            else:
+                self.error("Erro no parser: faltando )")
 
     def flux(self):
         # ifi (EXPR) scope_init S scope_end
@@ -197,7 +230,7 @@ class Parser():
         if ifi is None:
             return None
 
-        if not self.current_token:
+        if not self.do_loop:
             return ifi
 
         els = self.flux_els()
@@ -210,16 +243,22 @@ class Parser():
     def flux_ifi(self):
         # ifi (EXPR) scope_init S scope_end
         checkpoint = self.index
+        is_ifi = False
 
         sequence = ("ifi", "(", "EXPR", ")", "scope_init", "S", "scope_end")
         for i in enumerate(sequence):
-            if i[0] == 2:
+            if not self.do_loop:
+                break
+            if i[0] == 0 and self.current_token[0] == i[1]:
+                self.eat()
+                is_ifi = True
+            elif i[0] == 2:
                 expr = self.expr()
                 if expr is None:
                     break
             elif i[0] == 5:
                 s = []
-                while self.current_token[0] != "scope_end":
+                while self.do_loop and self.current_token[0] != "scope_end":
                     s.append(self.init())
                 if len(s) == 0:
                     break
@@ -230,18 +269,27 @@ class Parser():
         else:
             return sinTree.Ifi(expr, s, None)
 
-        self.rollback_to(checkpoint)
-        return None
+        if is_ifi:
+            self.error("Erro no parser: ifi incompleto")
+        else:
+            self.rollback_to(checkpoint)
+            return None
 
     def flux_els(self):
         # els scope_init S scope_end
         checkpoint = self.index
+        is_els = False
 
         sequence = ("els", "scope_init", "S", "scope_end")
         for i in enumerate(sequence):
-            if i[0] == 2:
+            if not self.do_loop:
+                break
+            if i[0] == 0:
+                self.eat()
+                is_els = True
+            elif i[0] == 2:
                 s = []
-                while self.current_token[0] != "scope_end":
+                while self.do_loop and self.current_token[0] != "scope_end":
                     s.append(self.init())
                 if len(s) == 0:
                     break
@@ -252,8 +300,11 @@ class Parser():
         else:
             return sinTree.Els(s)
 
-        self.rollback_to(checkpoint)
-        return None
+        if is_els:
+            self.error("Erro no parser: els incompleto")
+        else:
+            self.rollback_to(checkpoint)
+            return None
 
     def expr(self):
         # EXPR' OPBOOL EXPR' [(and|orr) EXPR] | EXPR'
@@ -351,18 +402,23 @@ class Parser():
 
     def rpt_whl(self):
         # whl (EXPR) scope_init S scope_end
-
         checkpoint = self.index
+        is_whl = False
 
         sequence = ("whl", "(", "EXPR", ")", "scope_init", "S", "scope_end")
         for i in enumerate(sequence):
-            if i[0] == 2:
+            if not self.do_loop:
+                break
+            if i[0] == 0 and self.current_token[0] == i[1]:
+                self.eat()
+                is_whl = True
+            elif i[0] == 2:
                 expr = self.expr()
                 if expr is None:
                     break
             elif i[0] == 5:
                 s = []
-                while self.current_token[0] != "scope_end":
+                while self.do_loop and self.current_token[0] != "scope_end":
                     s.append(self.init())
                 if len(s) == 0:
                     break
@@ -373,21 +429,31 @@ class Parser():
         else:
             return sinTree.Whl(expr, s)
 
-        self.rollback_to(checkpoint)
-        return None
+        if is_whl:
+            self.error("Erro no parser: whl incompleto")
+        else:
+            self.rollback_to(checkpoint)
+            return None
 
     def rpt_for(self):
         # for [type] var '=' RANGE scope_init S scope_end
-
         checkpoint = self.index
+        is_for = False
 
         sequence = ("for", "type", "var", "=", "RANGE", "scope_init", "S",
                     "scope_end")
         for i in enumerate(sequence):
-            if i[0] == 1:
+            if not self.do_loop:
+                break
+            if i[0] == 0 and self.current_token[0] == i[1]:
+                self.eat()
+                is_for = True
+            elif i[0] == 1:
                 if self.current_token[0] == "type":
                     typo = self.current_token[1]
                     self.eat()
+                else:
+                    typo = None
             elif i[0] == 2:
                 if self.current_token[0] == "var":
                     var = sinTree.Var(self.current_token[1])
@@ -403,7 +469,7 @@ class Parser():
                     break
             elif i[0] == 6:
                 s = []
-                while self.current_token[0] != "scope_end":
+                while self.do_loop and self.current_token[0] != "scope_end":
                     s.append(self.init())
                 if len(s) == 0:
                     break
@@ -414,8 +480,11 @@ class Parser():
         else:
             return sinTree.For(typo, var, rang, s)
 
-        self.rollback_to(checkpoint)
-        return None
+        if is_for:
+            self.error("Erro no parser: for incompleto")
+        else:
+            self.rollback_to(checkpoint)
+            return None
 
     def ranger(self):
         # num : num
@@ -441,5 +510,24 @@ class Parser():
             return sinTree.BinOp(num1, ":", num2)
         else:
             self.vomit()
+            self.vomit()
+            return None
+
+    def control(self):
+        # brk | jmp
+        if self.current_token[0] == "brk":
+            token = "brk"
+            self.eat()
+        elif self.current_token[0] == "jmp":
+            token = "jmp"
+            self.eat()
+        else:
+            return None
+
+        # ;
+        if self.current_token[0] == "eos":
+            self.eat()
+            return sinTree.Control(token)
+        else:
             self.vomit()
             return None
