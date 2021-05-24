@@ -1,5 +1,5 @@
 from .lexer_exceptions import ErroLexer
-from . import sym_table, afds
+from . import afds
 
 
 class simple_lexer:
@@ -14,7 +14,6 @@ class simple_lexer:
 
     def __init__(self, linhas_p_tratar):
         self.linhas = linhas_p_tratar
-        self.tabela_simb = sym_table.SymbolsTable()
         self.tokens_reconhecidos = []
         self.flattened_list = []
         self.current_token_it = None
@@ -66,11 +65,6 @@ class simple_lexer:
     def lista_p(self):
         # talvez utilize em mais de um lugar
         return isinstance(self.linhas, list)
-
-    def __add_to_symTable(self, sim_tbl):
-        self.tabela_simb.insert(sim_tbl[1],
-                                sim_tbl[0],
-                                sim_tbl[2])
 
     def reconhecer(self, uma_linha):
         lista_tokens = []
@@ -127,7 +121,6 @@ class simple_lexer:
                             break
 
                 lista_tokens.append(result)
-                self.__add_to_symTable(result)
                 p1 = p2
 
         # se p1 for diferente de p2 significa que a linha foi finalizada com um

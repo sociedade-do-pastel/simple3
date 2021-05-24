@@ -37,29 +37,24 @@ def FileReader(filename, listar=False):
     return GetAsList(filename)
 
 
-def compiledFileSave(filename, target, lex=False):
-    if lex:
-        with open(filename, "w") as arquivo:
-            for num, linhas in enumerate(target.tokens_reconhecidos, 1):
-                arquivo.write(f'Linha: {num} ')
-                if linhas is not None:
-                    for lexemas in linhas:
-                        arquivo.write(f'{str(lexemas)}, ')
-                arquivo.write('\n')
-            arquivo.write('\n'*10)
-            arquivo.write('Tabela de simbolos:\n')
-            for key, value in target.tabela_simb.get_table().items():
-                arquivo.write(f'{key} : {value} \n')
+def compiledFileSave(filename, target):
+    with open(filename, "w") as arquivo:
+        for element in target:
+            arquivo.write(f'{element}\n')
 
 
 def main(argv):
-    filename_to_save = "output.txt"
-
     if len(argv) < 2:
         print("Necessario um arquivo fonte da linguagem", file=sys.stderr)
         exit(1)  # se o usuario nao inseriu um arquivo fonte
     else:
         arquivo_raw = argv[1]
+
+        if len(argv) == 3:
+            filename_to_save = f"{argv[2]}.py"
+        else:
+            filename_to_save = f"{argv[1].split('/')[-1][:-4]}.py"
+
         try:
             alvo_comp = FileReader(arquivo_raw, True)
         except exceptions.ArquivoNaoPadronizado as ExcObj:
@@ -83,8 +78,7 @@ def main(argv):
         print(exx)
 
     # TODO tratar filenames de saída customizáveis (necessário?)
-    compiledFileSave(filename_to_save,
-                     lexing_object, lex=True)
+    compiledFileSave(filename_to_save, parsing_object.treeList)
 
 
 if __name__ == '__main__':

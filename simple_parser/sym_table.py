@@ -34,15 +34,8 @@ class SymbolsTable():
 
         name_exists = self._table.get(name)
 
-        if scope > 0:
-            name_scope = "local"
-        else:
-            name_scope = "global"
-
-        if name_exists:
-            self._table[name].append({'type': rec_type, 'scope': name_scope})
-        else:
-            self._table[name] = [dict({'type': rec_type, 'scope': name_scope})]
+        if not name_exists:
+            self._table[name] = dict({'type': rec_type, 'scope': scope})
 
         return self._table
 
@@ -58,3 +51,12 @@ class SymbolsTable():
 
         """
         return self._table.get(name)
+
+    def remove_by_scope(self, scope_num):
+        to_delete = []
+        for key,value in self._table.items():
+            if value["scope"] == scope_num:
+                to_delete.append(key)
+
+        for item in to_delete:
+            self._table.pop(item)

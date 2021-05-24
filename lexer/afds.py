@@ -5,7 +5,6 @@
 # A funcao categorizar_lex realiza a tarefa de "encontrar" e priorizar        #
 # certos automatos                                                            #
 ###############################################################################
-ESCOPO = 0  # global de escopo modificada por { ou }
 
 # tokens definidos no arquivo token.py
 reservados = {
@@ -74,7 +73,7 @@ def afd_num(lex):
             return None
 
     if current_state in final_states:
-        return ('num', lex, ESCOPO)
+        return ('num', lex)
 
 
 def afd_var(lex):
@@ -118,7 +117,7 @@ def afd_var(lex):
             return None
 
     if current_state in final_states:
-        return ('var', lex, ESCOPO)
+        return ('var', lex)
 
 
 def afd_str(lex):
@@ -149,7 +148,7 @@ def afd_str(lex):
                 return None
 
     if current_state in final_states:
-        return ('str', lex, ESCOPO)
+        return ('str', lex)
 
 
 def categorizar_lex(lex):
@@ -165,7 +164,6 @@ def categorizar_lex(lex):
        - Sucesso: Um ou mais tokens reconhecidos
        - Falha:   None
     '''
-    global ESCOPO  # mas praticas?
     result = None  # valor padrao
 
     if len(lex) == 3 and lex not in reservados:
@@ -178,10 +176,6 @@ def categorizar_lex(lex):
         result = afd_str(lex) or result
 
     if lex in reservados:
-        result = reservados.get(lex) + (ESCOPO,) or result
-        if result[0] == "scope_init":
-            ESCOPO += 1
-        elif result[0] == "scope_end":
-            ESCOPO -= 1
+        result = reservados.get(lex) or result
 
     return result
