@@ -107,7 +107,7 @@ class simple_lexer:
                     i = 0
                     while (p2 + i < tamanho_linha):
                         num_temp = afds.categorizar_lex(uma_linha[p1:p2+1+i])
-                        if uma_linha[p2-1+i] == '.':
+                        if uma_linha[p2+i] == '.':
                             i += 1
                             continue
 
