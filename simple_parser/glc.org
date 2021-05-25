@@ -1,4 +1,3 @@
-#+title: Gramática livre de contexto
 #+options: toc:nil date:nil
 #+startup: latexpreview
 #+attr_latex: \usepackage[margin=3cm]{geometry}

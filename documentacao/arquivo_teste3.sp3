@@ -3,14 +3,11 @@
 
 tof ktm = tru;
 
-num kph = 30;
-/3 initializing it with zero
-num mps = 0;
+num var = 30;
 /3 if the flag that tells us if we are going
 /3 from kilometers to meter is set to tru 
-ifi (ktm) {
-   mps = kph / 3.6
+ifi (ktm == tru) {
+    num mps = var / 3.6;
 } els {
-   kph = mps * 3.6
+    num kph = var * 3.6;
 }
-

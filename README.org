@@ -59,5 +59,14 @@
      - [X] RPT
      - [X] RANGE
      
-** TODO Analisador semântico
+** DONE Analisador semântico [2/2]
+
+- [X] Análise semântica
+  - [X] Checagem de tipos de variáveis
+  - [X] Checagem sobre operações binárias (tipos)
+- [X] Geração de código
+
+** TODO Correção de /bugs/ e testes 
+
+
 

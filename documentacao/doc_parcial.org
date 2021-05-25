@@ -99,7 +99,7 @@ python comple.py alvo.sp3
 
 Note que a extensão do arquivo deve conter, necessariamente, o sufixo
 =.sp3=. Qualquer outro arquivo será negado pelo compilador. O executável
-de saída após a compilação tem o nome fixo =output.py=.
+de saída após a compilação tem nome baseado no /filename/ do arquivo de entrada, isto é, a compilação de um arquivo =foo.sp3= resultaria num =foo.py=. 
 
 #+latex: \clearpage
 
@@ -116,30 +116,27 @@ seguir:
 
  #+include: "arquivo_teste2.sp3" src fundamental
 
-*** Converter de kmh/ms ou vice-versa
+*** Converter de quilômetros por hora para metros por segundo
 
  #+include: "arquivo_teste3.sp3" src fundamental
 
 * Estrutura do compilador
   
-  A seguir serão detalhados os processos de funcionamento e saída dos processos de compilação, os analisadores léxico, sintático e semântico. Note que, *os analisadores em si não produzem saída além do arquivo compilado final*, uma vez que estes são classes cujos membros são as variáveis relevantes para o programador que deseje as utilizar, no caso, para imprimir de maneira propriamente dita o resultado de algum passo que não seja tal arquivo final, o usuário *DEVE* modificar o arquivo fonte, que se apresenta bem documentado. 
+  A seguir serão detalhados os processos de funcionamento e saída dos processos de compilação, os analisadores léxico, sintático e semântico. Note que, *os analisadores em si não produzem saída além do arquivo compilado final e os devidos tratamentos de exceções*, uma vez que estes são classes cujos membros são as variáveis relevantes para o programador que deseje as utilizar, no caso, para imprimir de maneira propriamente dita o resultado de algum passo que não seja tal arquivo final, o usuário *DEVE* modificar o arquivo fonte, que se apresenta bem documentado. 
 
 ** O analisador léxico
 
 A lista produzida  tem como formato:
 
 #+begin_example
-[[(<tipo>, <valor>, escopo), (<tipo>, <valor>, escopo),...]]
+[[(<tipo>, <valor>), (<tipo>, <valor>),...]]
 #+end_example
-
-Na qual =escopo= tem valor de 0 (global) a 1 (local). Note que uma variável
-nomeada pode aparecer em mais de um local, a priorização, entretanto, será
-tratada em fases posteriores.
 
 O objeto =lexer= criado (se houver sucesso) é repassado como argumento para o construtor do passo a seguir, [[O analisador sintático]], alguns membros da classe os quais podem ser de interesse são:
 
 - =tokens_reconhecidos= :: *todos* os /tokens/ reconhecidos, cada um destes sendo um índice de uma *sub-lista*, cada *sub-lista* representando uma linha do arquivo fonte. 
-- =flattened_list= :: A lista de /tokens/ apresentada anteriormente na forma *flat*, ou seja, não apresenta estrutura matricial, =None= simbolizando novas linhas. 
+
+- =flattened_list= :: A lista de /tokens/ apresentada anteriormente na forma *flat*, ou seja, não apresenta estrutura matricial, esta é sempre passada como argumento para o construtor do analisador sintático. 
 
 Além disso, o método =get_next_token= prova-se útil durante a fase de *análise sintática* ao iterar sobre a =flattened_list= e manter em "cache" o /token/ a seguir. 
 
@@ -157,6 +154,47 @@ O analisador sintático também produz uma *Árvore sintática abstrata* ou /abs
 
 pode auxiliar o usuário a entender melhor o que cada classe (cada /token/ numa hierarquia) representa na estrutura completa da árvore. 
 
+** O analisador semântico 
+
+A análise semântica ocorre e sinaliza erros durante alguns casos específicos:
+
+- variável não declarada :: necessária *inicialização* das variáveis na linguagem, mesmo que seja utilizado um valor temporário ou "inútil";
+
+- brk ou jmp  :: se estes forem utilizados *fora* de um laço de repetição como =for= ou =whl=;
+
+- tipo incorreto utilizado  :: durante uma inicialização, se a variável recebeu um valor *incompatível* com seu tipo especificado, ex =num var = "foo"=;
+
+- operação com tipos incompatíveis :: se, em uma operação binária aritmética, por exemplo, uma das variáveis do conjunto tem um tipo incompatível com a operação, um exemplo sendo: =90 / "45"=;
+
+** Geração de código 
+
+A geração de código se aproveita do método =__str__= que a linguagem Python permite implementar com o objetivo de "resultar" em uma /string/ ao invocar o objeto durante uma chamada de função que se baseie em operações sobre *streams*. De forma geral, se incluirmos um objeto criado a partir de =Whl= (/while/) dentro de uma diretiva =print= ou =write=, este se "auto imprimirá" com o valor:
+
+#+begin_example
+while EXPRESSION: 
+    body1
+    body2
+    bodyn ... 
+#+end_example
+
+A equipe *modificou* o método =solve= para que este funcione de forma semelhante ao padrão *visitor*, implementando tratamentos apropriados para a linguagem a qual a compilação acontecerá para. Note que algumas checagens já ocorrem como no exemplo a seguir:
+
+#+begin_src python
+# No Var da arvore sintatica
+def solve(self):
+        var_in_table = var_table.lookup(self.value)
+        if not var_in_table:
+            raise Exception(
+                f"Erro semantico: variavel {self.value} usada mas nao declarada"
+            )
+        else:
+            dic_temp = {"num": Num(0), "str": Str(""), "tof": Bool("tru")}
+            # eval sobre variavel = valor da variavel 
+            return dic_temp[var_in_table["type"].value] 
+#+end_src
+
+Perceba a ocorrência da checagem de identificadores já existentes na tabela de símbolos uma vez que a *Simple3* requere que o programador inicialize suas variáveis. Note, também, que a presença da tabela de símbolos prova-se essencial durante a checagem de fatores como escopo e pré existência de identificadores. 
+
 ** Mudanças desde o início do projeto
    
    Desde o projeto inicial, ocorreram as seguintes mudanças:
@@ -164,4 +202,5 @@ pode auxiliar o usuário a entender melhor o que cada classe (cada /token/ numa 
 - =and= e =orr= :: Ambos operadores binários os quais podem ser representados por inúmeros =ifis=
 - =elf= :: ou =elif= no /Python/. Devido à possibilidade de se ter o mesmo comportamento com uma sequência (=els{ifi {num foo = 22;}}=), a equipe decidiu por excluir tal funcionalidade. 
    
-Ambas mudanças se deram pela falta de tempo para a entrega do analisador sintático por completo. Porém, o grupo definiu a linguagem como suficientemente completa, além de simples. É importante relembrar que este é um dos objetivos da linguagem.
+Ambas mudanças se deram pela falta de tempo para a entrega do compilador por completo. Porém, o grupo definiu a linguagem como suficientemente completa, além de simples. É importante relembrar que este é um dos objetivos da linguagem.
+
