@@ -284,7 +284,7 @@ class Parser():
         for i in enumerate(sequence):
             if not self.do_loop:
                 break
-            if i[0] == 0:
+            if i[0] == 0 and self.current_token[0] == "els":
                 self.eat()
                 is_els = True
             elif i[0] == 2:
