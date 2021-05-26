@@ -1,3 +1,5 @@
+/3 This is a rough implementation of the fibonacci's sequence
+/3 where fib = n defines what we want to evaluate
 num aca = 0;
 num acb = 1;
 num fib = 7; 

@@ -26,6 +26,7 @@ exemplo abaixo:
   : less tokens.py 
 
 ** Palavras-chave
+
 | *Keywords*  | Expressão regular | Observação                   |
 |-----------+-------------------+------------------------------|
 | /         | <                 | <                            |
@@ -88,16 +89,26 @@ exemplo abaixo:
 
 * Utilização do compilador
 
-Basta invocar o arquivo principal =comple.py= localizado na pasta raiz do
-projeto juntamente com a versão mais recente de *Python 3*. No caso, esta seria,
-também, a única dependência explícita do projeto. A sintaxe de uma compilação
-comum dá-se por:
+Em todos os sistemas operacionais, a linguagem é dependente do interpretador da linguagem *Python*. Sendo testada e programada seguindo os métodos e padrões definidos em sua versão mais recente, a *3.9.5*. A seguir, serão apresentadas as possíveis formas para executar o compilador da linguagem:
 
-#+begin_src sh
-python comple.py alvo.sp3
-#+end_src
+: ./simple3 arquivo_entrada <nome_saida_opcional>
 
-Note que a extensão do arquivo deve conter, necessariamente, o sufixo
+
+Caso não seja suprimido um nome para o arquivo de saída, este se baseará no /filename/ do arquivo de entrada. Outras possibilidades :
+
+- Arquivo de saída sem ".py" :: Será incluído o sufixo ".py" no /filename/ desejado, exemplo: =./simple3 foo => foo.py=;
+- Arquivo de saída não suprimido :: O compilador produzirá um erro sem produzir um arquivo de saída compilado;
+
+
+Se a execução do /shell script/ falhar, é possível invocar o compilador diretamente através do comando:
+
+: python comple.py arquivo_entrada <nome_saida_opcional>
+
+OBSERVAÇÃO: Alguns sistemas GNU/Linux baseados em Debian como Ubuntu têm =python3= em seu =PATH= como chamada do interpretador da linguagem. Para este caso, o usuário deve modificar o comando anterior.
+
+** A extensão padrão 
+
+A extensão do arquivo deve conter, necessariamente, o sufixo
 =.sp3=. Qualquer outro arquivo será negado pelo compilador. O executável
 de saída após a compilação tem nome baseado no /filename/ do arquivo de entrada, isto é, a compilação de um arquivo =foo.sp3= resultaria num =foo.py=. 
 
@@ -119,6 +130,30 @@ seguir:
 *** Converter de quilômetros por hora para metros por segundo
 
  #+include: "arquivo_teste3.sp3" src fundamental
+
+*** Teste da idade
+
+ #+include: "arquivo_teste4.sp3" src fundamental
+
+*** Saudações
+
+ #+include: "arquivo_teste5.sp3" src fundamental
+
+*** Sequência de Fibonacci 
+
+ #+include: "arquivo_teste6.sp3" src fundamental
+
+*** Soma de todos os números até 100
+
+ #+include: "arquivo_teste7.sp3" src fundamental
+
+*** Laço infinito
+
+ #+include: "arquivo_teste8.sp3" src fundamental
+
+*** Fatorial
+
+ #+include: "arquivo_teste9.sp3" src fundamental
 
 * Estrutura do compilador
   
