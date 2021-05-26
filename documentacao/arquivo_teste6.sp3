@@ -1,0 +1,12 @@
+num aca = 0;
+num acb = 1;
+num fib = 7; 
+num cnt = 1;
+num res = 0;
+
+whl (cnt < fib) {
+    num res = aca + acb;
+    num aca = acb;
+    num acb = res;
+    num cnt = cnt + 1;
+}

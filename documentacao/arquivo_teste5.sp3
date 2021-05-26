@@ -1,0 +1,16 @@
+/3 This program greets the user with the proper message which depends
+/3 on the current time of the day
+num hor = 14;
+
+str out = "";
+
+ifi (hor < 12) {
+    str out = "Good morning/Opa, bom dia";
+} els {
+    ifi (hor < 19) {
+    	str out = "Good afternoon/Opa, boa tarde";
+    } els {
+        str out = "Good evening/Opa, boa noite";
+    }
+}
+

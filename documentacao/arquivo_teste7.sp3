@@ -1,0 +1,6 @@
+/3 This program sums all numbers up to 101 (exclusive)
+num tmp = 0;
+num cnt = 0;
+for cnt = 0:101 {
+    num tmp = tmp + cnt;
+}

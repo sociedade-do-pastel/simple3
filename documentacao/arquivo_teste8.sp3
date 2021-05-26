@@ -1,0 +1,7 @@
+/3 This program just runs infinitely and keeps count in a variable
+num lol = 0;
+
+whl (1) {
+    num lol = lol + 1;    
+}
+

@@ -1,0 +1,13 @@
+/3 This program evaluates n-1 factorial, where n is defined by the user
+
+num tmp = 0;
+num res = 1;
+
+/3 now we evaluate 7!
+for tmp = 0:8 {
+    ifi (tmp == 0) {
+    	num res = res * 1;
+    } els {
+      num res = res * tmp;
+    }
+}

@@ -1,0 +1,23 @@
+/3 This program allows you to find out
+/3 your age by "inputting" the year that
+/3 you were born in
+
+/3 year that we're in
+num cur = 2021;
+
+/3 year that a person was born
+num yar = 1994;
+
+num age = cur - yar;
+
+str out  = "";
+/3 now we're gonna judge whether a person is old or not
+ifi (age < 20 ) {
+    str out = "How do you do fellow kid?";
+} els {
+    ifi (age < 41) {
+      str out = "Life is young, at least for you";
+      } els {
+        str out = "Ok boomer";
+      }
+}
