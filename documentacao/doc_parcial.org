@@ -155,6 +155,14 @@ seguir:
 
  #+include: "arquivo_teste9.sp3" src fundamental
 
+*** Raízes de uma equação de segundo grau
+
+ #+include: "arquivo_teste10.sp3" src fundamental
+
+*** Força bruta
+
+ #+include: "arquivo_teste11.sp3" src fundamental
+
 * Estrutura do compilador
   
   A seguir serão detalhados os processos de funcionamento e saída dos processos de compilação, os analisadores léxico, sintático e semântico. Note que, *os analisadores em si não produzem saída além do arquivo compilado final e os devidos tratamentos de exceções*, uma vez que estes são classes cujos membros são as variáveis relevantes para o programador que deseje as utilizar, no caso, para imprimir de maneira propriamente dita o resultado de algum passo que não seja tal arquivo final, o usuário *DEVE* modificar o arquivo fonte, que se apresenta bem documentado. 

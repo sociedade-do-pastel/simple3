@@ -1,0 +1,13 @@
+/3 This program bruteforces through a series of numbers
+/3 until it finds the target given by the user
+
+num tgt = 88;
+num tmp = 0;
+
+whl (tgt != tmp) {
+
+    ifi (tgt > tmp) {
+    	brk;
+    }
+    num tgt = tgt + (1/2);
+}

@@ -1,0 +1,11 @@
+/3 This program calculates the roots of a quadratic equation
+num qua = 2;
+num qub = (0 - 1);
+num quc = (0 - 8);
+
+num dtl = (qub^2 - (4 * (qua * quc)))^0.5;
+
+num ftx = ((0 - qub) + dtl)/(2 * qua);
+num scx = ((0 - qub) - dtl)/(2 * qua);
+
+
