@@ -125,9 +125,14 @@ class Parser():
                               node_list[2])
 
     def literal(self):
-        # str | MATLAB | BOOL
+        # str | MATLAB | BOOL | emp
         if self.current_token[0] == "str":
             tree_node = sinTree.Str(self.current_token[1])
+            self.eat()
+            return tree_node
+
+        if self.current_token[0] == "emp":
+            tree_node = sinTree.Emp(self.current_token[1])
             self.eat()
             return tree_node
 
@@ -509,12 +514,15 @@ class Parser():
             return None
 
     def control(self):
-        # brk | jmp
+        # brk | jmp | emp
         if self.current_token[0] == "brk":
             token = "brk"
             self.eat()
         elif self.current_token[0] == "jmp":
             token = "jmp"
+            self.eat()
+        elif self.current_token[0] == "emp":
+            token = "emp"
             self.eat()
         else:
             return None
