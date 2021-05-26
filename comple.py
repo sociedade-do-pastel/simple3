@@ -70,12 +70,17 @@ def main(argv):
         lexing_object.analise_lexica()
     except ErroLexer as LexErr:
         print(LexErr, sys.stderr)
+        sys.exit()
+
     lexing_object.flatten_token_list()
+
     try:
         parsing_object = Parser(lexing_object.flattened_list)
-        # parsing_object.init()
+        parsing_object.parse()
+        parsing_object.solve()  # analisador semântico
     except Exception as exx:
         print(exx)
+        sys.exit()
 
     # TODO tratar filenames de saída customizáveis (necessário?)
     compiledFileSave(filename_to_save, parsing_object.treeList)

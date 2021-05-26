@@ -1,4 +1,3 @@
-import sys
 from . import arvore_sintatica as sinTree
 
 
@@ -7,11 +6,8 @@ class Parser():
         self.token_list = token_list
         self.index = 0
         self.current_token = self.token_list[self.index]
-        self.code_line = 1
         self.do_loop = True
         self.treeList = []
-        self.bootstrap()
-        self.solveIter()
 
     def error(self, message=False):
         raise Exception(message if message else "deu merda")  # arrumar depois
@@ -52,29 +48,22 @@ class Parser():
         if self.current_token is None:
             self.eat()
 
-    def bootstrap(self):
+    def parse(self):
         """
             Faz a inicialização do parsing
         """
         while self.do_loop:
-            try:
-                self.treeList.append(self.init())
-            except Exception as e:
-                print(e)
-                return
+            self.treeList.append(self.s())
 
-    def solveIter(self):
+    def solve(self):
         """
             Chama iterativamente as funções solve
         """
-        try:
-            for i in self.treeList:
-                i.solve()
-        except Exception as e:
-            print(e)
+        for i in self.treeList:
+            i.solve()
 
     # Isso aqui é o S dos não terminais
-    def init(self):
+    def s(self):
         func_list = [self.decvar, self.matlab, self.flux, self.rpt,
                      self.control]
 
@@ -259,7 +248,7 @@ class Parser():
             elif i[0] == 5:
                 s = []
                 while self.do_loop and self.current_token[0] != "scope_end":
-                    s.append(self.init())
+                    s.append(self.s())
                 if len(s) == 0:
                     break
             elif self.current_token[0] == i[1]:
@@ -290,7 +279,7 @@ class Parser():
             elif i[0] == 2:
                 s = []
                 while self.do_loop and self.current_token[0] != "scope_end":
-                    s.append(self.init())
+                    s.append(self.s())
                 if len(s) == 0:
                     break
             elif self.current_token[0] == i[1]:
@@ -419,7 +408,7 @@ class Parser():
             elif i[0] == 5:
                 s = []
                 while self.do_loop and self.current_token[0] != "scope_end":
-                    s.append(self.init())
+                    s.append(self.s())
                 if len(s) == 0:
                     break
             elif self.current_token[0] == i[1]:
@@ -470,7 +459,7 @@ class Parser():
             elif i[0] == 6:
                 s = []
                 while self.do_loop and self.current_token[0] != "scope_end":
-                    s.append(self.init())
+                    s.append(self.s())
                 if len(s) == 0:
                     break
             elif self.current_token[0] == i[1]:
