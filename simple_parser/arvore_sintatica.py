@@ -455,6 +455,7 @@ class Ifi(Node):
         var_table.remove_by_scope(self.scope+1)
 
         if self.els:
+            self.els.inside_loop = self.inside_loop
             self.els.scope = self.scope
             self.els.solve()
 
@@ -479,9 +480,12 @@ class Els(Node):
         self.s = s
         self.tab = ""
         self.scope = 0
+        self.inside_loop = False
 
     def solve(self):
         for line in self.s:
+            if isinstance(line, (Control, Ifi)):
+                line.inside_loop = self.inside_loop
             line.scope = self.scope + 1
             line.solve()
         var_table.remove_by_scope(self.scope+1)
