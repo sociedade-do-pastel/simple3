@@ -5,8 +5,14 @@ class Parser():
     def __init__(self, token_list):
         self.token_list = token_list
         self.index = 0
-        self.current_token = self.token_list[self.index]
-        self.do_loop = True
+
+        if len(self.token_list) > 0:
+            self.current_token = self.token_list[self.index]
+            self.do_loop = True
+        else:
+            self.current_token = None
+            self.do_loop = False
+
         self.treeList = []
 
     def error(self, message=False):
