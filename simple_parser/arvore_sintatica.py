@@ -61,7 +61,7 @@ class BinOp(Node):
             if not isinstance(esquerda, Num) or not isinstance(direita, Num):
                 erro(f"Erro semântico: operação {self.operator} só pode ser feitas com dois números")
             return Num(0)
-        elif self.operator == "==":
+        elif self.operator in ("==", "!="):
             if isinstance(esquerda, Var) or isinstance(direita, Var):
                 if isinstance(esquerda.value, type(direita.value)):
                     return esquerda
@@ -288,12 +288,14 @@ class Control(Node):
             erro(f"Erro semântico: uso de {self.value} fora de uma estrutura de repetição")
 
     def __str__(self):
+        tab = "\t"*self.scope
+
         if self.value == "brk":
-            return "break"
+            return f"{tab}break"
         elif self.value == "jmp":
-            return "continue"
+            return f"{tab}continue"
         elif self.value == "emp":
-            return "pass"
+            return f"{tab}pass"
 
 
 class Decvar(Node):
@@ -360,7 +362,7 @@ class Whl(Node):
         if isinstance(r, Str):
             erro("Erro semântico: Expressão de whl não pode ser str")
         for line in self.s:
-            if isinstance(line, Control):
+            if isinstance(line, (Control, Ifi)):
                 line.inside_loop = True
             line.scope = self.scope + 1
             line.solve()
@@ -412,7 +414,7 @@ class For(Node):
         self.rang.solve()
 
         for line in self.s:
-            if isinstance(line, Control):
+            if isinstance(line, (Control, Ifi)):
                 line.inside_loop = True
             line.scope = self.scope + 1
             line.solve()
@@ -439,11 +441,14 @@ class Ifi(Node):
         self.els = els
         self.tab = ""
         self.scope = 0
+        self.inside_loop = False
 
     def solve(self):
         self.expr.solve()
 
         for line in self.s:
+            if isinstance(line, (Control, Ifi)):
+                line.inside_loop = self.inside_loop
             line.scope = self.scope + 1
             line.solve()
 

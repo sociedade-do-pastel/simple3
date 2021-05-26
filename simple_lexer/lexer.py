@@ -97,7 +97,7 @@ class Lexer:
 
             # token encontrado
             if result:
-                if result[1] in ("<", ">", "="):
+                if result[1] in ("<", ">", "=", "!"):
                     test = afds.categorizar_lex(uma_linha[p1:p2+1])
                     if test:
                         p2 += 1

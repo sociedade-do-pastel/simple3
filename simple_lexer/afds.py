@@ -42,6 +42,7 @@ reservados = {
     ">=": ("operator", ">="),
     "=": ("operator", "="),
     "==": ("operator", "=="),
+    "!=": ("operator", "!="),
     "!": ("operator", "!"),
     ":": (":", ":")
 }

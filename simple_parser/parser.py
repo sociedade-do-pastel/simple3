@@ -377,7 +377,7 @@ class Parser():
         return None
 
     def opbool(self):
-        tokens_aceitos = ("==", ">", ">=", "<", "<=")
+        tokens_aceitos = ("==", "!=", ">", ">=", "<", "<=")
         if self.current_token[1] in tokens_aceitos:
             a = sinTree.BinOp(None, self.current_token[1], None)
             self.eat()
