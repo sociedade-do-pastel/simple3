@@ -43,17 +43,25 @@ def compiledFileSave(filename, target):
             arquivo.write(f'{element}\n')
 
 
+def getOutputName(argv):
+    if len(argv) == 3 and argv[2][-3:] == ".py":
+        filename_to_save = f"{argv[2]}"
+    elif len(argv) == 3:
+        filename_to_save = f"{argv[2]}.py"
+    else:
+        filename_to_save = f"{argv[1].split('/')[-1][:-4]}.py"
+
+    return filename_to_save
+
+
 def main(argv):
     if len(argv) < 2:
         print("Necessario um arquivo fonte da linguagem", file=sys.stderr)
-        exit(1)  # se o usuario nao inseriu um arquivo fonte
+        sys.exit(1)  # se o usuario nao inseriu um arquivo fonte
     else:
         arquivo_raw = argv[1]
 
-        if len(argv) == 3:
-            filename_to_save = f"{argv[2]}.py"
-        else:
-            filename_to_save = f"{argv[1].split('/')[-1][:-4]}.py"
+        filename_to_save = getOutputName(argv)
 
         try:
             alvo_comp = FileReader(arquivo_raw, True)
@@ -70,7 +78,7 @@ def main(argv):
         lexing_object.analise_lexica()
     except ErroLexer as LexErr:
         print(LexErr, sys.stderr)
-        sys.exit()
+        sys.exit(1)
 
     lexing_object.flatten_token_list()
 
@@ -80,7 +88,7 @@ def main(argv):
         parsing_object.solve()  # analisador semântico
     except Exception as exx:
         print(exx)
-        sys.exit()
+        sys.exit(1)
 
     # TODO tratar filenames de saída customizáveis (necessário?)
     compiledFileSave(filename_to_save, parsing_object.treeList)
