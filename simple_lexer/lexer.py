@@ -2,7 +2,7 @@ from .lexer_exceptions import ErroLexer
 from . import afds
 
 
-class simple_lexer:
+class Lexer:
     '''
     Implementação do analisador lexico de passagem unica.
     Pelo fato deste apenas

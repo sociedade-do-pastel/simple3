@@ -12,8 +12,8 @@ import sys
 # imports das classes do grupo
 from simple_exceptions import exceptions
 # aqui virao os analisadores lexico e sintatico
-from lexer.simple_lexer import simple_lexer
-from lexer.lexer_exceptions import ErroLexer
+from simple_lexer.lexer import Lexer
+from simple_lexer.lexer_exceptions import ErroLexer
 from simple_parser.parser import Parser
 
 
@@ -66,7 +66,7 @@ def main(argv):
                   file=sys.stderr)
         # quando ocorrido algum erro na etapa de análise léxica
     try:
-        lexing_object = simple_lexer(alvo_comp)
+        lexing_object = Lexer(alvo_comp)
         lexing_object.analise_lexica()
     except ErroLexer as LexErr:
         print(LexErr, sys.stderr)

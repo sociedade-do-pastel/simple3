@@ -3,6 +3,11 @@ from . import sym_table as syt
 
 var_table = syt.SymbolsTable()
 
+
+def erro(err):
+    raise Exception(err)
+
+
 class Node(ABC):
     """
     Classe abstrata representante de cada nó da árvore,
@@ -54,8 +59,7 @@ class BinOp(Node):
         if self.operator in ("+", "-", "*", "/", "^",
                              ":", ">=", "<=", ">", "<"):
             if not isinstance(esquerda, Num) or not isinstance(direita, Num):
-                raise Exception(
-                    f"Erro semântico: operação {self.operator} só pode ser feitas com dois números")
+                erro(f"Erro semântico: operação {self.operator} só pode ser feitas com dois números")
             return Num(0)
         elif self.operator == "==":
             if isinstance(esquerda, Var) or isinstance(direita, Var):
@@ -64,8 +68,7 @@ class BinOp(Node):
             elif isinstance(esquerda, type(direita)):
                 return esquerda
 
-            raise Exception(
-                f"Erro semântico: operação {self.operator} só pode ser feitas com dois tipos iguais")
+            erro(f"Erro semântico: operação {self.operator} só pode ser feitas com dois tipos iguais")
 
     def __str__(self):
         if self.operator == ":":
@@ -246,9 +249,7 @@ class Var(Node):
     def solve(self):
         var_in_table = var_table.lookup(self.value)
         if not var_in_table:
-            raise Exception(
-                f"Erro semântico: variável {self.value} usada mas não declarada"
-            )
+            erro(f"Erro semântico: variável {self.value} usada mas não declarada")
         else:
             dic_temp = {"num": Num(0), "str": Str(""), "tof": Bool("tru")}
             return dic_temp[var_in_table["type"]]
@@ -281,8 +282,7 @@ class Control(Node):
 
     def solve(self):
         if not self.inside_loop:
-            raise Exception(
-                f"Erro semântico: uso de {self.value} fora de uma estrutura de repetição")
+            erro(f"Erro semântico: uso de {self.value} fora de uma estrutura de repetição")
 
     def __str__(self):
         if self.value == "brk":
@@ -312,22 +312,18 @@ class Decvar(Node):
         var_in_table = var_table.lookup(self.var.value)
 
         if var_in_table and var_in_table["type"] != self.var_type.value:
-            raise Exception(
-                f"Erro semântico: {self.var} declarado anteriormente com tipo {var_in_table['type']} ao invés de {self.var_type}")
+            erro(f"Erro semântico: {self.var} declarado anteriormente com tipo {var_in_table['type']} ao invés de {self.var_type}")
 
         literal_temp = self.literal
         if isinstance(self.literal, (BinOp, Var)):
             literal_temp = self.literal.solve()
 
         if self.var_type.value == "num" and not isinstance(literal_temp, Num):
-            raise Exception(
-                f"Erro semântico: {self.literal} não pode ser declarado como num")
+            erro(f"Erro semântico: {self.literal} não pode ser declarado como num")
         elif self.var_type.value == "str" and not isinstance(literal_temp, Str):
-            raise Exception(
-                f"Erro semântico: {self.literal} não pode ser declarado como str")
+            erro(f"Erro semântico: {self.literal} não pode ser declarado como str")
         elif self.var_type.value == "tof" and not isinstance(literal_temp, Bool):
-            raise Exception(
-                f"Erro semântico: {self.literal} não pode ser declarado como tof")
+            erro(f"Erro semântico: {self.literal} não pode ser declarado como tof")
 
         var_table.insert(self.var.value, self.var_type.value, self.scope)
 
@@ -395,20 +391,16 @@ class For(Node):
         var_in_table = var_table.lookup(self.var.value)
 
         if self.typo and var_in_table:
-            raise Exception(
-                f"Erro semântico: {self.var} já foi declarado anteriormente")
+            erro(f"Erro semântico: {self.var} já foi declarado anteriormente")
         elif self.typo and not var_in_table:
             if self.typo != "num":
-                raise Exception(
-                    f"Erro semântico: {self.var} declarado como {self.typo} para operador range")
+                erro(f"Erro semântico: {self.var} declarado como {self.typo} para operador range")
             else:
                 var_table.insert(self.var, self.typo, self.scope)
         elif not self.typo and not var_in_table:
-            raise Exception(
-                    f"Erro semântico: {self.var} usado mas não declarado")
+            erro(f"Erro semântico: {self.var} usado mas não declarado")
         elif not self.typo and var_in_table and var_in_table["type"] != "num":
-            raise Exception(
-                f"Erro semântico: variável {self.var} é {var_in_table['type']}, deve ser num")
+            erro(f"Erro semântico: variável {self.var} é {var_in_table['type']}, deve ser num")
 
         self.rang.solve()
 
