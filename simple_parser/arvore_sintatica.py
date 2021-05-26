@@ -251,7 +251,7 @@ class Var(Node):
             )
         else:
             dic_temp = {"num": Num(0), "str": Str(""), "tof": Bool("tru")}
-            return dic_temp[var_in_table["type"].value]
+            return dic_temp[var_in_table["type"]]
 
     def __str__(self):
         return self.value
@@ -310,12 +310,13 @@ class Decvar(Node):
 
     def solve(self):
         var_in_table = var_table.lookup(self.var.value)
-        if var_in_table and var_in_table["type"].value != self.var_type.value:
+
+        if var_in_table and var_in_table["type"] != self.var_type.value:
             raise Exception(
                 f"Erro semântico: {self.var} declarado anteriormente com tipo {var_in_table['type']} ao invés de {self.var_type}")
 
         literal_temp = self.literal
-        if isinstance(self.literal, BinOp):
+        if isinstance(self.literal, (BinOp, Var)):
             literal_temp = self.literal.solve()
 
         if self.var_type.value == "num" and not isinstance(literal_temp, Num):
@@ -328,10 +329,11 @@ class Decvar(Node):
             raise Exception(
                 f"Erro semântico: {self.literal} não pode ser declarado como tof")
 
-        var_table.insert(self.var.value, self.var_type, self.scope)
+        var_table.insert(self.var.value, self.var_type.value, self.scope)
 
     def __str__(self):
-        return f"{self.var} = {self.literal}"
+        tabs = "\t" * self.scope
+        return f"{tabs}{self.var} = {self.literal}"
 
 
 class Whl(Node):
@@ -352,28 +354,26 @@ class Whl(Node):
         self.tab = ""
         self.scope = 0
 
-    def tabify(self):
-        self.tab += "\t"
-
     def solve(self):
         self.expr.solve()
         for line in self.s:
             if isinstance(line, Control):
                 line.inside_loop = True
-            line.scope += 1
+            line.scope = self.scope + 1
             line.solve()
 
         var_table.remove_by_scope(self.scope+1)
 
     def __str__(self):
         result = ""
+        eol = "\n"
+
+        self.tab = "\t" * self.scope
+
         for line in self.s:
-            if isinstance(line, (Whl, For, Ifi)):
-                line.tabify()
             if line == self.s[-1]:
-                result += f"{self.tab}\t{line}"
-            else:
-                result += f"{self.tab}\t{line}\n"
+                eol = ""
+            result += f"{line}{eol}"
         return f"{self.tab}while {self.expr}:\n{result}"
 
 
@@ -391,9 +391,6 @@ class For(Node):
         self.tab = ""
         self.scope = 0
 
-    def tabify(self):
-        self.tab += "\t"
-
     def solve(self):
         var_in_table = var_table.lookup(self.var.value)
 
@@ -409,7 +406,7 @@ class For(Node):
         elif not self.typo and not var_in_table:
             raise Exception(
                     f"Erro semântico: {self.var} usado mas não declarado")
-        elif not self.typo and var_in_table and var_in_table["type"].value != "num":
+        elif not self.typo and var_in_table and var_in_table["type"] != "num":
             raise Exception(
                 f"Erro semântico: variável {self.var} é {var_in_table['type']}, deve ser num")
 
@@ -418,21 +415,22 @@ class For(Node):
         for line in self.s:
             if isinstance(line, Control):
                 line.inside_loop = True
-            line.scope += 1
+            line.scope = self.scope + 1
             line.solve()
 
         var_table.remove_by_scope(self.scope+1)
 
     def __str__(self):
         result = ""
+        eol = "\n"
+
+        self.tab = "\t" * self.scope
+
         for line in self.s:
-            if isinstance(line, (Whl, For, Ifi)):
-                line.tabify()
             if line == self.s[-1]:
-                result += f"{self.tab}\t{line}"
-            else:
-                result += f"{self.tab}\t{line}\n"
-        return f"for {self.var} in {self.rang}:\n{result}"
+                eol = ""
+            result += f"{line}{eol}"
+        return f"{self.tab}for {self.var} in {self.rang}:\n{result}"
 
 
 class Ifi(Node):
@@ -443,13 +441,11 @@ class Ifi(Node):
         self.tab = ""
         self.scope = 0
 
-    def tabify(self):
-        self.tab += "\t"
-
     def solve(self):
         self.expr.solve()
+
         for line in self.s:
-            line.scope += 1
+            line.scope = self.scope + 1
             line.solve()
 
         var_table.remove_by_scope(self.scope+1)
@@ -460,21 +456,19 @@ class Ifi(Node):
 
     def __str__(self):
         result = ""
-        if self.els is None:
-            els = ""
-        else:
-            self.els.tabify()
+        els = ""
+        eol = "\n"
+
+        self.tab = "\t"*self.scope
+
+        if self.els:
             els = str(self.els)
 
         for line in self.s:
-            if isinstance(line, (Whl, For, Ifi, Els)):
-                line.tabify()
-            if line == self.s[-1]:
-                result += f"{self.tab}\t{line}"
-            else:
-                result += f"{self.tab}\t{line}\n"
-        return f"if {self.expr}:\n{result}{els}"
-
+            if line == self.s[-1] and not self.els:
+                eol = ""
+            result += f"{line}{eol}"
+        return f"{self.tab}if {self.expr}:\n{result}{els}"
 
 class Els(Node):
     def __init__(self, s):
@@ -482,23 +476,20 @@ class Els(Node):
         self.tab = ""
         self.scope = 0
 
-    def tabify(self):
-        self.tab += "\t"
-
     def solve(self):
         for line in self.s:
-            line.scope += 1
+            line.scope = self.scope + 1
             line.solve()
         var_table.remove_by_scope(self.scope+1)
 
     def __str__(self):
         result = ""
+        eol = "\n"
+
+        self.tab = "\t" * self.scope
 
         for line in self.s:
-            if isinstance(line, (Whl, For, Ifi)):
-                line.tabify()
             if line == self.s[-1]:
-                result += f"{self.tab}\t{line}"
-            else:
-                result += f"{self.tab}\t{line}"
+                eol = ""
+            result += f"{line}{eol}"
         return f"{self.tab}else:\n{result}"
