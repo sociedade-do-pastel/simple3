@@ -176,7 +176,10 @@ class Bool(Node):
         return self
 
     def __str__(self):
-        return self.value
+        if self.value == "tru":
+            return "True"
+        elif self.value =="fls":
+            return "Falseh"
 
 
 class Emp(Node):
@@ -351,7 +354,9 @@ class Whl(Node):
         self.scope = 0
 
     def solve(self):
-        self.expr.solve()
+        r = self.expr.solve()
+        if isinstance(r, Str):
+            erro("Erro semântico: Expressão de whl não pode ser str")
         for line in self.s:
             if isinstance(line, Control):
                 line.inside_loop = True
@@ -396,7 +401,7 @@ class For(Node):
             if self.typo != "num":
                 erro(f"Erro semântico: {self.var} declarado como {self.typo} para operador range")
             else:
-                var_table.insert(self.var, self.typo, self.scope)
+                var_table.insert(self.var.value, self.typo, self.scope)
         elif not self.typo and not var_in_table:
             erro(f"Erro semântico: {self.var} usado mas não declarado")
         elif not self.typo and var_in_table and var_in_table["type"] != "num":
