@@ -17,13 +17,14 @@
   
 * Membros
 
-  | Nome                            |         RA |
-  |---------------------------------+------------|
-  | Leon Ferreira Bellini           | 22218002-8 |
-  | Pedro Freitas Magalhães Barbosa | 22218013-5 |
-  | Felipe Maciel de Sousa          | 22218042-4 |
-  | Guilherme Ormond Sampaio        | 22218007-7 |
-  |---------------------------------+------------|
+|---------------------------------+------------|
+| Nome                            |         RA |
+|---------------------------------+------------|
+| Leon Ferreira Bellini           | 22218002-8 |
+| Pedro Freitas Magalhães Barbosa | 22218013-5 |
+| Felipe Maciel de Sousa          | 22218042-4 |
+| Guilherme Ormond Sampaio        | 22218007-7 |
+|---------------------------------+------------|
 
 * Como utilizar o compilador
 
@@ -68,5 +69,16 @@
 
 ** TODO Correção de /bugs/ e testes 
 
+* Quanto aos arquivos teste
 
+O /script/ a seguir realiza a compilação de todos os arquivos para teste do compilador. Estes podem ser achados no diretório =documentacao=.
 
+#+begin_src sh :tangle teste.sh :tangle-mode (identity #o755)
+#!/usr/bin/sh
+for arq in documentacao/*.sp3; do
+    out=$(./simple3.sh "$arq")
+    if [ ${#out} -gt 0 ]; then
+	echo "Erro ao tentar compilar o arquivo" "$arq"
+    fi
+done 
+#+end_src
