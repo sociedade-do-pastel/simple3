@@ -199,10 +199,10 @@ class Emp(Node):
         self.value = value
 
     def solve(self):
-        return self
+        return self.value
 
     def __str__(self):
-        return self.value
+        return "None"
 # Type
 # durante a declaração de variável nesta linguagem fracamente tipada,
 # uma variável pode assumir o tipo Str, num ou tof
@@ -284,7 +284,7 @@ class Control(Node):
         self.scope = 0
 
     def solve(self):
-        if not self.inside_loop:
+        if not self.inside_loop and self.value != "emp":
             erro(f"Erro semântico: uso de {self.value} fora de uma estrutura de repetição")
 
     def __str__(self):
@@ -292,6 +292,8 @@ class Control(Node):
             return "break"
         elif self.value == "jmp":
             return "continue"
+        elif self.value == "emp":
+            return "pass"
 
 
 class Decvar(Node):
@@ -321,11 +323,11 @@ class Decvar(Node):
         if isinstance(self.literal, (BinOp, Var)):
             literal_temp = self.literal.solve()
 
-        if self.var_type.value == "num" and not isinstance(literal_temp, Num):
+        if self.var_type.value == "num" and not isinstance(literal_temp, (Num, Emp)):
             erro(f"Erro semântico: {self.literal} não pode ser declarado como num")
-        elif self.var_type.value == "str" and not isinstance(literal_temp, Str):
+        elif self.var_type.value == "str" and not isinstance(literal_temp, (Str, Emp)):
             erro(f"Erro semântico: {self.literal} não pode ser declarado como str")
-        elif self.var_type.value == "tof" and not isinstance(literal_temp, Bool):
+        elif self.var_type.value == "tof" and not isinstance(literal_temp, (Bool, Emp)):
             erro(f"Erro semântico: {self.literal} não pode ser declarado como tof")
 
         var_table.insert(self.var.value, self.var_type.value, self.scope)

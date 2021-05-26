@@ -6,7 +6,7 @@
 \begin{align*}
 S &\rightarrow \text{DECVAR | MATLAB | FLUX | RPT | CONTROL} \\
 \text{DECVAR} &\rightarrow \text{type var '=' LITERAL eos}\\
-\text{LITERAL} &\rightarrow \text{str | num | MATLAB | BOOL}\\
+\text{LITERAL} &\rightarrow \text{str | MATLAB | BOOL | emp}\\
 \text{BOOL} &\rightarrow \text{tru | fls} \\
 \text{MATLAB} &\rightarrow \text{MATLAB' (+ | -) MATLAB' [eos] | MATLAB'} [eos] \\
 \text{MATLAB'} &\rightarrow \text{MATLAB'' (* | / | \^{}) MATLAB'' [eos] | MATLAB''} \\
@@ -20,5 +20,5 @@ S &\rightarrow \text{DECVAR | MATLAB | FLUX | RPT | CONTROL} \\
 \text{RPT} &\rightarrow \text{whl ( EXPR ) scope\_init S scope\_end} \\
 \text{RPT} &\rightarrow \text{for [type] var '=' RANGE scope\_init S scope\_end} \\
 \text{RANGE} &\rightarrow \text{num : num} \\
-\text{CONTROL} &\rightarrow \text{brk | jmp}
+\text{CONTROL} &\rightarrow \text{(brk | jmp | emp) eos}
 \end{align*}
