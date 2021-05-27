@@ -96,7 +96,7 @@ class Parser():
                 node_list.append(self.current_token[1])
                 self.eat()
                 pace += 1
-            elif self.current_token[0] == "operator" and pace == 2:
+            elif self.current_token[1] == "=" and pace == 2:
                 self.eat()
                 pace += 1
             elif pace == 3:
@@ -156,8 +156,8 @@ class Parser():
             return None
 
     def matlab(self, consume_eos=True):
-        # MATLAB   ->  MATLAB' (+ | -) MATLAB' [eos] | MATLAB' [eos]
-        # MATLAB'  ->  MATLAB'' (* | / | ^) MATLAB'' [eos] | MATLAB''
+        # MATLAB   ->  MATLAB' (+ | -) MATLAB [eos] | MATLAB' [eos]
+        # MATLAB'  ->  MATLAB'' (* | / | ^) (MATLAB' | MATLAB) [eos] | MATLAB''
         # MATLAB'' ->  num | var | '(' MATLAB ')'
         node1 = self.matlab1(consume_eos)
 
@@ -173,7 +173,7 @@ class Parser():
         else:
             return node1
 
-        node2 = self.matlab1(consume_eos)
+        node2 = self.matlab(consume_eos)
         if not node2:
             self.error("Erro no parser: operação matlab incompleta")
 
@@ -195,10 +195,12 @@ class Parser():
         else:
             return node1
 
-        node2 = self.matlab2(consume_eos)
+        node2 = self.matlab1(consume_eos)
 
         if not node2:
-            self.error("Erro no parser: operação matlab incompleta")
+            node2 = self.matlab(consume_eos)
+            if not node2:
+                self.error("Erro no parser: operação matlab incompleta")
 
         if consume_eos and self.current_token and self.current_token[0] == "eos":
             self.eat()
@@ -308,7 +310,7 @@ class Parser():
 
     def expr(self):
         # EXPR' OPBOOL EXPR' [(and|orr) EXPR] | EXPR'
-        # LITERAL | (EXPR)
+        # LITERAL | (EXPR) | ! '(' EXPR ')'
 
         # EXPR'
         expr1 = self.expr2()
@@ -351,13 +353,11 @@ class Parser():
             return op2
 
     def expr2(self):
-        # LITERAL | (EXPR)
+        # LITERAL | (EXPR) | ! EXPR
 
         # LITERAL
         a = self.literal()
-        if a is None:
-            pass
-        else:
+        if a is not None:
             return a
 
         # (EXPR)
@@ -366,13 +366,29 @@ class Parser():
             self.eat()
             a = self.expr()
             if a is None:
-                self.vomit(1)
+                self.vomit()
                 return None
             elif self.current_token[0] == ")":
                 self.eat()
                 return a
             else:
                 self.rollback_to(checkpoint)
+
+        # ! EXPR
+        if self.current_token[1] == "!":
+            checkpoint = self.index
+            self.eat()
+            if self.current_token[0] == "(":
+                self.eat()
+            else:
+                self.error("Erro no parser: operação ! não seguido de parênteses")
+            a = self.expr()
+            if a is None:
+                self.rollback_to(checkpoint)
+            else:
+                if self.current_token[0] == ")":
+                    self.eat()
+                    return sinTree.UnOP("!", a)
 
         return None
 

@@ -101,10 +101,15 @@ class UnOP(Node):
         self.operand = operand
 
     def solve(self):
-        pass
+        expr = self.operand.solve()
+        if isinstance(expr, Str):
+            erro(f"Erro semântico: operador unário {self.operator} não é possível com str")
+        else:
+            return expr
 
     def __str__(self):
-        pass
+        if self.operator == "!":
+            return f"not ({self.operand})"
 
 # Tokens literais (símbolos não terminais)
 # Os nós a seguir simbolizam os não terminais literais da gramática:
@@ -179,7 +184,7 @@ class Bool(Node):
         if self.value == "tru":
             return "True"
         elif self.value =="fls":
-            return "Falseh"
+            return "False"
 
 
 class Emp(Node):

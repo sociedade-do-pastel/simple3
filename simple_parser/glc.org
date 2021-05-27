@@ -8,14 +8,14 @@ S &\rightarrow \text{DECVAR | MATLAB | FLUX | RPT | CONTROL} \\
 \text{DECVAR} &\rightarrow \text{type var '=' LITERAL eos}\\
 \text{LITERAL} &\rightarrow \text{str | MATLAB | BOOL | emp}\\
 \text{BOOL} &\rightarrow \text{tru | fls} \\
-\text{MATLAB} &\rightarrow \text{MATLAB' (+ | -) MATLAB' [eos] | MATLAB'} [eos] \\
-\text{MATLAB'} &\rightarrow \text{MATLAB'' (* | / | \^{}) MATLAB'' [eos] | MATLAB''} \\
+\text{MATLAB} &\rightarrow \text{MATLAB' (+ | -) MATLAB [eos] | MATLAB' [eos]} \\
+\text{MATLAB'} &\rightarrow \text{MATLAB'' (* | / | \^{}) (MATLAB' | MATLAB) [eos] | MATLAB''} \\
 \text{MATLAB''} &\rightarrow \text{num | var | '(' MATLAB ')'} \\
 \text{OPERADOR} &\rightarrow \text{+ | - | / | * | }\hat{}\\
 \text{FLUX} &\rightarrow \text{ifi (EXPR) scope\_init S scope\_end} \\
 \text{FLUX} &\rightarrow \text{ifi (EXPR) scope\_init S scope\_end els scope\_init S scope\_end} \\
 \text{EXPR} &\rightarrow \text{EXPR' OPBOOL EXPR' | EXPR'} \\
-\text{EXPR} &\rightarrow \text{LITERAL | (EXPR)} \\
+\text{EXPR} &\rightarrow \text{LITERAL | (EXPR) | ! '(' EXPR ')' } \\
 \text{OPBOOL} &\rightarrow \text{== | > | >= | < | <=} \\
 \text{RPT} &\rightarrow \text{whl ( EXPR ) scope\_init S scope\_end} \\
 \text{RPT} &\rightarrow \text{for [type] var '=' RANGE scope\_init S scope\_end} \\
