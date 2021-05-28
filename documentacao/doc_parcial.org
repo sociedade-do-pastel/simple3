@@ -51,13 +51,13 @@ exemplo abaixo:
 
 ** Literais
 
-| Literais | Expressão regular      | Observação  |
-|----------+------------------------+-------------|
-| /        | <                      | <           |
-| =num=      | "[0-9]+(\.[0-9]+)?"    |             |
-| =str=      | "\"[\wedge\"]*\""      |             |
-| =comment=  | "\wedge(\/3).*\dollar" | linha única |
-|----------+------------------------+-------------|
+| Literais | Expressão regular   | Observação  |
+|----------+---------------------+-------------|
+| /        | <                   | <           |
+| =num=      | "[0-9]+(\.[0-9]+)?" |             |
+| =str=      | "\"[\wedge\"]*\""        |             |
+| =comment=  | "\wedge(\/3).*\dollar"         | linha única |
+|----------+---------------------+-------------|
 
 ** Identificadores
 
@@ -76,7 +76,7 @@ exemplo abaixo:
 | \(-\)      | "\-"              |                       |
 | \(*\)      | "\*"              |                       |
 | \(/\)      | "\/"              |                       |
-| \(\hat{}\) | "\wedge"          | exponenciação         |
+| \(\hat{}\) | "\wedge"               | exponenciação         |
 | \(>\)      | "\>"              |                       |
 | \(<\)      | "\<"              |                       |
 | \(>=\)     | "\>\="            |                       |
@@ -163,6 +163,14 @@ seguir:
 
  #+include: "arquivo_teste11.sp3" src fundamental
 
+*** Prioridade de operações
+
+ #+include: "arquivo_teste12.sp3" src fundamental
+
+*** Operador NOT
+
+ #+include: "arquivo_teste13.sp3" src fundamental
+
 * Estrutura do compilador
   
   A seguir serão detalhados os processos de funcionamento e saída dos processos de compilação, os analisadores léxico, sintático e semântico. Note que, *os analisadores em si não produzem saída além do arquivo compilado final e os devidos tratamentos de exceções*, uma vez que estes são classes cujos membros são as variáveis relevantes para o programador que deseje as utilizar, no caso, para imprimir de maneira propriamente dita o resultado de algum passo que não seja tal arquivo final, o usuário *DEVE* modificar o arquivo fonte, que se apresenta bem documentado. 
@@ -209,19 +217,6 @@ A análise semântica ocorre e sinaliza erros durante alguns casos específicos:
 
 - operação com tipos incompatíveis :: se, em uma operação binária aritmética, por exemplo, uma das variáveis do conjunto tem um tipo incompatível com a operação, um exemplo sendo: =90 / "45"=;
 
-** Geração de código 
-
-A geração de código se aproveita do método =__str__= que a linguagem Python permite implementar com o objetivo de "resultar" em uma /string/ ao invocar o objeto durante uma chamada de função que se baseie em operações sobre *streams*. De forma geral, se incluirmos um objeto criado a partir de =Whl= (/while/) dentro de uma diretiva =print= ou =write=, este se "auto imprimirá" com o valor:
-
-#+begin_example
-while EXPRESSION: 
-    body1
-    body2
-    bodyn ... 
-#+end_example
-
-A equipe *modificou* o método =solve= para que este funcione de forma semelhante ao padrão *visitor*, implementando tratamentos apropriados para a linguagem a qual a compilação acontecerá para. Note que algumas checagens já ocorrem como no exemplo a seguir:
-
 #+begin_src python
 # No Var da arvore sintatica
 def solve(self):
@@ -238,12 +233,68 @@ def solve(self):
 
 Perceba a ocorrência da checagem de identificadores já existentes na tabela de símbolos uma vez que a *Simple3* requere que o programador inicialize suas variáveis. Note, também, que a presença da tabela de símbolos prova-se essencial durante a checagem de fatores como escopo e pré existência de identificadores. 
 
+** Geração de código 
+
+A geração de código se aproveita do método =__str__= no qual é possível que a linguagem trata de maneira diferenciada. Com este tipo de método, objetos que os possuam podem "resultar"  em uma /string/ ao serem invocados durante uma chamada de função que se baseie em operações sobre *streams*. De forma geral, se incluirmos um objeto criado a partir de =Whl= (/while/) dentro de uma diretiva =print= ou =write=, este se "auto imprimirá" com o valor:
+
+#+begin_example
+while EXPRESSION: 
+    body1
+    body2
+    bodyn 
+    ... 
+#+end_example
+
+Além disso,  equipe *modificou* o método =solve= criado durante uma fase de desenvolvimento anterior, para que este funcione de forma semelhante ao padrão *visitor*, implementando tratamentos apropriados para a linguagem a qual a compilação acontecerá para. Note que algumas checagens já ocorrem como no exemplo a seguir:
+
+#+begin_src python
+def __str__(self):
+    if self.operator == ":":
+        return f"range({self.left}, {self.right})"
+    elif self.operator == "^":
+        return f"( {self.left} ** {self.right} )"
+    else:
+        return f"( {self.left} {self.operator} {self.right} )"
+#+end_src
+
+É evidenciada no exemplo anterior, a "visita" de ambos os nós da sub-árvore formada por um operador binário genérico, classe denominada como =BinOp= na árvore sintática abstrata. Cada nó tem seu método =__str__= chamado, gerando as devidas transformações para código em *Python 3*. 
+
 ** Mudanças desde o início do projeto
    
    Desde o projeto inicial, ocorreram as seguintes mudanças:
 
 - =and= e =orr= :: Ambos operadores binários os quais podem ser representados por inúmeros =ifis=
-- =elf= :: ou =elif= no /Python/. Devido à possibilidade de se ter o mesmo comportamento com uma sequência (=els{ifi {num foo = 22;}}=), a equipe decidiu por excluir tal funcionalidade. 
+
+- =elf= :: ou =elif= no /Python/. Devido a possibilidade de se obter o mesmo comportamento com uma sequência (=els{ifi {num foo = 22;}}=), a equipe decidiu por excluir tal funcionalidade. 
    
 Ambas mudanças se deram pela falta de tempo para a entrega do compilador por completo. Porém, o grupo definiu a linguagem como suficientemente completa, além de simples. É importante relembrar que este é um dos objetivos da linguagem.
+
+* Particularidades da linguagem
+
+Em alguns aspectos, a *Simple3* diferencia-se das outras baseadas nas clássicas derivadas da família ALGOL (C, C++, Java, Javascript, etc.), algumas das mais notáveis sendo:
+
+- Operador NOT :: onde o operando deve sempre estar cercado de parênteses, ex: =(!(fls))=;
+
+  - Quanto a inicialização de variáveis :: =!= não opera enquanto dentro de uma inicialização de variável;
+
+- Inicialização e redefinição de variáveis :: ambas operações apresentam a mesma sintaxe. Redefinição, entretanto, permite a reutilização recursiva da variável já definida, ex: =num aaa = aaa + 42;= onde =aaa= já foi definida anteriormente;
+
+- Apenas letras em nomes de identificadores :: não é permitida a presença de *números* em identificadores, um identificador nomeado =ab1=, por exemplo, causaria um erro durante a fase de análise léxica;
+
+- Comentários :: apenas de linha única e não podem ser precedidos por quaisquer outros caracteres presentes ou não na linguagem definida, ex: =whl (1) { /3 aaaaa (NÃO PERMITIDO)=
+
+- Espaço em branco numa linha :: partindo do pressuposto que cada identificador e/ou /keyword/ tem o valor *fixo* de três caracteres, não é necessária a presença de espaço em branco para que sejam identificados estes elementos como é possível notar a seguir:
+
+#+begin_src fundamental
+numaaa=1*1*3+1/5^9;numbbb=1*1*(3+1)/5^9;
+numccc=(1*1)*3+(1/5)^9;numccc=(1*1)*(3+(1/5))^9;
+numfff=((1*1)*(3+1/5))^9;ifi(!(fls)){emp;}
+#+end_src
+
+- Os desenvolvedores recomendam que espaços em branco ainda sejam utilizados para que uma melhor legibilidade seja obtida.
+
+
+
+
+
 

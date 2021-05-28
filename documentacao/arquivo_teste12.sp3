@@ -1,0 +1,5 @@
+/3 This program acts as a "demo" that shows simple3's arithmetic capabilities
+num sum = 0;
+for num ind = 0:101 {
+    num sum = sum + 2*ind + (ind^(ind^ind) - (42 * (ind - 200)) + ind * ind + ind * 9);
+}

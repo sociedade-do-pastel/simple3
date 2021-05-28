@@ -1,0 +1,14 @@
+/3 This program shows us how the boolean NOT operator works,
+/3 =tst= acts as an alternative to our =brk= statement
+
+tof tst = fls;
+num ctl = 0;
+
+whl (!(tst)) {
+
+    ifi (ctl == 20)
+    {
+	tof tst = tru;
+    }
+    num ctl = ctl + 1 / 2;
+}
