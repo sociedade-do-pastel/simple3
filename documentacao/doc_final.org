@@ -51,13 +51,13 @@ exemplo abaixo:
 
 ** Literais
 
-| Literais | Expressão regular   | Observação  |
-|----------+---------------------+-------------|
-| /        | <                   | <           |
-| =num=      | "[0-9]+(\.[0-9]+)?" |             |
-| =str=      | "\"[\wedge\"]*\""        |             |
-| =comment=  | "\wedge(\/3).*\dollar"         | linha única |
-|----------+---------------------+-------------|
+| Literais | Expressão regular      | Observação  |
+|----------+------------------------+-------------|
+| /        | <                      | <           |
+| =num=      | "[0-9]+(\.[0-9]+)?"    |             |
+| =str=      | "\"[\wedge\"]*\""      |             |
+| =comment=  | "\wedge(\/3).*\dollar" | linha única |
+|----------+------------------------+-------------|
 
 ** Identificadores
 
@@ -76,7 +76,7 @@ exemplo abaixo:
 | \(-\)      | "\-"              |                       |
 | \(*\)      | "\*"              |                       |
 | \(/\)      | "\/"              |                       |
-| \(\hat{}\) | "\wedge"               | exponenciação         |
+| \(\hat{}\) | "\wedge"          | exponenciação         |
 | \(>\)      | "\>"              |                       |
 | \(<\)      | "\<"              |                       |
 | \(>=\)     | "\>\="            |                       |
@@ -97,6 +97,7 @@ Em todos os sistemas operacionais, a linguagem é dependente do interpretador da
 Caso não seja suprimido um nome para o arquivo de saída, este se baseará no /filename/ do arquivo de entrada. Outras possibilidades :
 
 - Arquivo de saída sem ".py" :: Será incluído o sufixo ".py" no /filename/ desejado, exemplo: =./simple3 foo => foo.py=;
+
 - Arquivo de saída não suprimido :: O compilador produzirá um erro sem produzir um arquivo de saída compilado;
 
 
@@ -119,7 +120,7 @@ de saída após a compilação tem nome baseado no /filename/ do arquivo de entr
 Um arquivo fonte da *Simple3* tem estrutura semelhante ao(s) exemplo(s) a
 seguir:
 
-*** Descobrir idade e demo para estruturas para /loop/
+*** Condicional - /ifi/ 
 
  #+include: "arquivo_teste.sp3" src fundamental
 
@@ -173,7 +174,7 @@ seguir:
 
 * Estrutura do compilador
   
-  A seguir serão detalhados os processos de funcionamento e saída dos processos de compilação, os analisadores léxico, sintático e semântico. Note que, *os analisadores em si não produzem saída além do arquivo compilado final e os devidos tratamentos de exceções*, uma vez que estes são classes cujos membros são as variáveis relevantes para o programador que deseje as utilizar, no caso, para imprimir de maneira propriamente dita o resultado de algum passo que não seja tal arquivo final, o usuário *DEVE* modificar o arquivo fonte, que se apresenta bem documentado. 
+  A seguir serão detalhados os processos de funcionamento e saída dos processos de compilação, os analisadores léxico, sintático e semântico. Note que, *os analisadores em si não produzem saída para o usuário além do arquivo compilado final e os devidos tratamentos de exceções*, se desejado conhecer os valores dos membros de tais classes, é necessário modificar o arquivo fonte.
 
 ** O analisador léxico
 
@@ -193,7 +194,7 @@ Além disso, o método =get_next_token= prova-se útil durante a fase de *análi
 
 ** O analisador sintático
    
-   Assim que inicializado, o analisador sintático mantém em memória o /token/ atual (=current_token=) e o seguinte. Desta forma, é possível iterar sobre a =flattened_list= e manter, ao mesmo tempo, uma forma de /lookahead/. 
+   Assim que inicializado, o analisador sintático mantém em memória o /token/ atual (=current_token=) e o seguinte. Desta forma, é possível iterar sobre a =flattened_list= e manter, ao mesmo tempo, uma forma de /lookahead/. Além deste elemento, o analisador sintático também mantém em memória o índice para o /token/ anterior, tal função "retorna" o valor do /token/ atual para o anterior. Por fim, outra sub rotina relevante seria a chamada =vomit=, a qual "retorna" o /token/ consumido ao anterior.
 
 A estrutura do /parser/ foi baseada na gramática livre de contexto definida a seguir, note que, para cada símbolo terminal é definida uma função para implementação por meio da "técnica" de /parsing/ recursiva descendente. 
    
@@ -213,7 +214,7 @@ A análise semântica ocorre e sinaliza erros durante alguns casos específicos:
 
 - brk ou jmp  :: se estes forem utilizados *fora* de um laço de repetição como =for= ou =whl=;
 
-- tipo incorreto utilizado  :: durante uma inicialização, se a variável recebeu um valor *incompatível* com seu tipo especificado, ex =num var = "foo"=;
+- tipo incorreto utilizado  :: durante uma inicialização, se a variável recebeu um valor *incompatível* com seu tipo especificado, ex =num var = "foo";=;
 
 - operação com tipos incompatíveis :: se, em uma operação binária aritmética, por exemplo, uma das variáveis do conjunto tem um tipo incompatível com a operação, um exemplo sendo: =90 / "45"=;
 
