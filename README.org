@@ -28,7 +28,7 @@
 
 * Como utilizar o compilador
 
-  Consulte o arquivo contido na pasta =documentacao=, [[file:documentacao/doc_parcial.org][doc_parcial]]. Este contém
+  Consulte o arquivo contido na pasta =documentacao=, [[file:documentacao/doc_final.org][doc_final]]. Este contém
   exemplos e instruções de como utilizar o compilador. 
 
 * O andamento do projeto
