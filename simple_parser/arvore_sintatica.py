@@ -1,17 +1,30 @@
+#############################################################################################
+# Árvore sintática abstrata cujo cada nó representa um elemento ou                          #
+# operação da linguagem, os nós terminais sendo os /tokens/ definidos na GLC.               #
+#############################################################################################
+
 from abc import ABC, abstractmethod
 from . import sym_table as syt
-
+# símbolos serão importantes durante a análise semântica
 var_table = syt.SymbolsTable()
 
 
 def erro(err):
+    """
+    Função a qual representa um erro genérico ``levantado'' durante a análise.
+
+    Argumentos:
+
+    err - Mensagem relevante que informe a exception atual
+    """
     raise Exception(err)
 
 
 class Node(ABC):
     """
-    Classe abstrata representante de cada nó da árvore,
-    seus métodos obrigatórios a serem implementados são:
+    Classe abstrata representante de cada nó da árvore.
+
+    Seus métodos obrigatórios a serem implementados são:
 
     solve -- soluciona a expressão válida na gramática através do Python.
     __str__ -- apresenta a expressão baseada na estrutura dos nós filhos
@@ -20,7 +33,7 @@ class Node(ABC):
 
     @abstractmethod
     def solve(self):
-        """Função abstrata para validar operações."""
+        """Função abstrata para validar operações e varrer a árvore."""
         pass
 
     @abstractmethod
@@ -31,7 +44,7 @@ class Node(ABC):
 
 class BinOp(Node):
     """
-    Essa classe representa uma operação binária na linguagem e herda de Node;
+    Essa classe representa uma operação binária na linguagem e herda de Node.
 
     Uma operação binária pode ser do tipo
     "+", "-", "*", "/", ":", "^", ":",
@@ -53,6 +66,7 @@ class BinOp(Node):
         self.operator = operator
 
     def solve(self):
+        """Aqui são tratados os operadores possíveis em operações binárias."""
         esquerda = self.left.solve()
         direita = self.right.solve()
 
@@ -71,6 +85,15 @@ class BinOp(Node):
             erro(f"Erro semântico: operação {self.operator} só pode ser feitas com dois tipos iguais")
 
     def __str__(self):
+        """
+        Transformação de código do operador binário.
+
+        Este podendo gerar as seguintes ``strings'':
+
+        expr1 ** expr2 - expr1 elevado ao expr2
+        range(expr1, expr2) - intervalo fechado-aberto, [expr1, expr2[
+        expr1 operator expr2 - expr (+ ou - ou / ou * ou ^ ...)
+        """
         if self.operator == ":":
             return f"range({self.left}, {self.right})"
         elif self.operator == "^":
@@ -101,6 +124,7 @@ class UnOP(Node):
         self.operand = operand
 
     def solve(self):
+        """Tratamentos necessários de tipo serão realizados para expr."""
         expr = self.operand.solve()
         if isinstance(expr, Str):
             erro(f"Erro semântico: operador unário {self.operator} não é possível com str")
@@ -108,6 +132,7 @@ class UnOP(Node):
             return expr
 
     def __str__(self):
+        """Gerado código do tipo not (expr) (parens necessários!)."""
         if self.operator == "!":
             return f"not ({self.operand})"
 
@@ -118,8 +143,9 @@ class UnOP(Node):
 
 class Num(Node):
     """
-    Podendo ser um float ou int da linguagem Python, o num é um nó que pode
-    assumir esse valor e somente esse valor.
+    Podendo ser um float ou int da linguagem Python.
+
+    O num é um nó que pode assumir esse valor e somente esse valor.
     """
 
     def __init__(self, value):
@@ -133,16 +159,16 @@ class Num(Node):
         self.value = value
 
     def solve(self):
+        """Retornado o objeto para tratamentos de igualdade (isinstance)."""
         return self
 
     def __str__(self):
+        """Tal número ``resulta'' em seu próprio valor."""
         return self.value
 
 
 class Str(Node):
-    """
-    Representa uma string da linguagem.
-    """
+    """Representa uma string da linguagem."""
 
     def __init__(self, value):
         """
@@ -156,16 +182,16 @@ class Str(Node):
         self.value = value
 
     def solve(self):
+        """Retornado instância para tratamentos em métodos de igualdade."""
         return self
 
     def __str__(self):
+        """Toda String ``resulta'' em si mesma."""
         return self.value
 
 
 class Bool(Node):
-    """
-    Nó o qual representa um booleano da linguagem.
-    """
+    """Nó o qual representa um booleano da linguagem."""
 
     def __init__(self, value):
         """
@@ -178,20 +204,19 @@ class Bool(Node):
         self.value = value
 
     def solve(self):
+        """Retornada instância para tratamentos de igualdade (isinstance)."""
         return self
 
     def __str__(self):
+        """Valor a ser retornado depende do valor resultante."""
         if self.value == "tru":
             return "True"
-        elif self.value =="fls":
+        elif self.value == "fls":
             return "False"
 
 
 class Emp(Node):
-    """
-    Vazio/undefined/nullptr da linguagem, o token assume o mesmo nome que
-    o nó.
-    """
+    """Vazio/nil da linguagem, o token assume o mesmo nome que o nó."""
 
     def __init__(self, value):
         """
@@ -204,9 +229,11 @@ class Emp(Node):
         self.value = value
 
     def solve(self):
+        """Emp resulta na instância de si mesmo."""
         return self.value
 
     def __str__(self):
+        """Emp = None na linguagem Python."""
         return "None"
 # Type
 # durante a declaração de variável nesta linguagem fracamente tipada,
@@ -214,9 +241,7 @@ class Emp(Node):
 
 
 class Type(Node):
-    """
-    Tipo da variável a ser declarada.
-    """
+    """Tipo da variável a ser declarada."""
 
     def __init__(self, value):
         """
@@ -229,9 +254,11 @@ class Type(Node):
         self.value = value
 
     def solve(self):
+        """Instância é retornada para checagens de equalidade."""
         return self
 
     def __str__(self):
+        """Tipo de um identificador é o próprio tipo."""
         return self.value
 
 # Var
@@ -240,9 +267,7 @@ class Type(Node):
 
 
 class Var(Node):
-    """
-    Identificador para a variável, podendo receber três letras.
-    """
+    """Identificador para a variável, podendo receber três letras."""
 
     def __init__(self, value):
         """
@@ -255,6 +280,7 @@ class Var(Node):
         self.value = value
 
     def solve(self):
+        """Deve ser checado se o identificador fora declarado anteriormente."""
         var_in_table = var_table.lookup(self.value)
         if not var_in_table:
             erro(f"Erro semântico: variável {self.value} usada mas não declarada")
@@ -263,6 +289,7 @@ class Var(Node):
             return dic_temp[var_in_table["type"]]
 
     def __str__(self):
+        """Valor de um identificador é o próprio identificador."""
         return self.value
 
 # Estruturas relacionadas a controle de fluxo
@@ -277,8 +304,7 @@ class Control(Node):
 
     def __init__(self, value):
         """
-        Construtor padrão de um nó o qual representa a parada ou não
-        de um laço de repetição
+        Construtor padrão de um nó que representa a parada ou não de um laço.
 
         Argumentos:
 
@@ -289,10 +315,12 @@ class Control(Node):
         self.scope = 0
 
     def solve(self):
+        """Checado se break ou continue não foram utilizados fora de loops."""
         if not self.inside_loop and self.value != "emp":
             erro(f"Erro semântico: uso de {self.value} fora de uma estrutura de repetição")
 
     def __str__(self):
+        """Quebra (ou continuação) genérica de laços."""
         tab = "\t"*self.scope
 
         if self.value == "brk":
@@ -304,16 +332,17 @@ class Control(Node):
 
 
 class Decvar(Node):
+    """Declaração de variáveis da linguagem, também serve de reatribuição."""
+
     def __init__(self, var_type, var, literal):
         """
-            Construtor padrão de um nó o qual representa a declaração
-            de uma variável
+        Construtor padrão de um nó o qual representa a declaração.
 
-            Argumentos:
+        Argumentos:
 
-            var_type -- recebe uma instância da classe Type
-            var -- recebe uma instância da classe Var
-            literal -- recebe uma instância da classe Num, Str ou Bool
+        var_type -- recebe uma instância da classe Type
+        var -- recebe uma instância da classe Var
+        literal -- recebe uma instância da classe Num, Str ou Bool
         """
         self.var_type = var_type
         self.var = var
@@ -321,6 +350,13 @@ class Decvar(Node):
         self.scope = 0
 
     def solve(self):
+        """
+        Decvar é totalmente dependente da corretude dos tipos definidos.
+
+        Todas as checagens por erros e inconsistências semânticas devem
+        ocorrer de forma que um número seja declarado como número e redifinido
+        como número, por exemplo.
+        """
         var_in_table = var_table.lookup(self.var.value)
 
         if var_in_table and var_in_table["type"] != self.var_type.value:
@@ -340,6 +376,11 @@ class Decvar(Node):
         var_table.insert(self.var.value, self.var_type.value, self.scope)
 
     def __str__(self):
+        """
+        Por ser fracamente tipado, ``perde-se'' a tipagem tratada no simple3.
+
+        Decvar apresenta a estrutura: tipo identificador = valor;
+        """
         tabs = "\t" * self.scope
         return f"{tabs}{self.var} = {self.literal}"
 
@@ -347,11 +388,14 @@ class Decvar(Node):
 class Whl(Node):
     """
     Nó o qual representa uma estrutura de repetição whl (while/do).
+
     Seu nó filho pode conter todas as estruturas do programa (S).
     """
 
     def __init__(self, expr, s):
         """
+        Estrutura de loop mais simples da linguagem.
+
         Argumentos:
 
         expr -- expressão teste que induza a execução do laço
@@ -363,6 +407,7 @@ class Whl(Node):
         self.scope = 0
 
     def solve(self):
+        """É testada se expr é válida."""
         r = self.expr.solve()
         if isinstance(r, Str):
             erro("Erro semântico: Expressão de whl não pode ser str")
@@ -375,6 +420,7 @@ class Whl(Node):
         var_table.remove_by_scope(self.scope+1)
 
     def __str__(self):
+        """Whl será traduzido como: TAB*while expr:NEWLINE S."""
         result = ""
         eol = "\n"
 
@@ -390,10 +436,20 @@ class Whl(Node):
 class For(Node):
     """
     Semelhante ao whl, um laço for geralmente tem fim defindo (range).
+
     Este nó representa essa estrutura.
     """
 
     def __init__(self, typo, var, rang, s):
+        """
+        Construtor único do laço de repetição controlado.
+
+        Argumentos:
+
+        typo - tipo opcional da variável
+        var  - identificador da variável
+        rang - range x:y o qual define um range de x até y-1
+        """
         self.typo = typo
         self.var = var
         self.rang = rang
@@ -402,6 +458,7 @@ class For(Node):
         self.scope = 0
 
     def solve(self):
+        """Realizados todos os mesmos tratamentos semânticos de S."""
         var_in_table = var_table.lookup(self.var.value)
 
         if self.typo and var_in_table:
@@ -427,6 +484,11 @@ class For(Node):
         var_table.remove_by_scope(self.scope+1)
 
     def __str__(self):
+        """
+        Gerado for do python dependente da função ``range()''.
+
+        Assume a forma: for var in range(lower_bound, higher_bound)
+        """
         result = ""
         eol = "\n"
 
@@ -440,7 +502,23 @@ class For(Node):
 
 
 class Ifi(Node):
+    """
+    Nó representante da estrutura condicional ``ifi''.
+
+    Tem formato ifi (expr) {S}, se ``expr'' for verdadeira,
+    todas as expressões contidas em S são executadas
+    """
+
     def __init__(self, expr, s, els):
+        """
+        Construtor padrão do nó Ifi.
+
+        Argumentos:
+
+        expr - teste o qual define se THEN ou ELSE será executado
+        s    - pode expandir para qualquer outro elemento da linguagem
+        els  - els é opcional e será executado caso expr resulte em falso
+        """
         self.expr = expr
         self.s = s
         self.els = els
@@ -449,6 +527,11 @@ class Ifi(Node):
         self.inside_loop = False
 
     def solve(self):
+        """
+        É verificado se é necessário chamar recursivamente as expressões em S.
+
+        Criado um erro caso o contrário.
+        """
         self.expr.solve()
 
         for line in self.s:
@@ -465,6 +548,12 @@ class Ifi(Node):
             self.els.solve()
 
     def __str__(self):
+        """
+        Geração do código da estrutura condicional ifi.
+
+        Gerado como ifi (expr) {S}. Podendo gerar um condicional ALTERNATIVO
+        ELS caso necessário
+        """
         result = ""
         els = ""
         eol = "\n"
@@ -481,13 +570,17 @@ class Ifi(Node):
         return f"{self.tab}if {self.expr}:\n{result}{els}"
 
 class Els(Node):
+    """ELSE branch genérico, podendo conter todos os elementos da linguagem."""
+
     def __init__(self, s):
+        """S - toda a linguagem."""
         self.s = s
         self.tab = ""
         self.scope = 0
         self.inside_loop = False
 
     def solve(self):
+        """Checagem por mais estruturas de controle ou laço ocorrem aqui."""
         for line in self.s:
             if isinstance(line, (Control, Ifi)):
                 line.inside_loop = self.inside_loop
@@ -496,6 +589,7 @@ class Els(Node):
         var_table.remove_by_scope(self.scope+1)
 
     def __str__(self):
+        """Produção do código do els, a indentação é gerada automaticamente."""
         result = ""
         eol = "\n"
 
