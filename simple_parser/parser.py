@@ -2,7 +2,18 @@ from . import arvore_sintatica as sinTree
 
 
 class Parser():
+    """
+    Classe responsável por todo o parser da linguagem.
+
+    Implementado utilizando GLCs.
+    """
+
     def __init__(self, token_list):
+        """
+        Construtor padrão da classe.
+
+        token_list = lista de tokens recebida pelo lexer
+        """
         self.token_list = token_list
         self.index = 0
 
@@ -16,12 +27,15 @@ class Parser():
         self.treeList = []
 
     def error(self, message=False):
+        """
+        Invoca uma exceção.
+
+        Caso não receba parâmetro, imprime um erro genérico.
+        """
         raise Exception(message if message else "deu merda")  # arrumar depois
 
     def eat(self):
-        """
-            Avança para o próximo token
-        """
+        """Avança para o próximo token."""
         self.index += 1
         if self.index >= len(self.token_list):
             self.do_loop = False
@@ -29,9 +43,7 @@ class Parser():
             self.current_token = self.token_list[self.index]
 
     def vomit(self):
-        """
-            Retrocede para o token anterior
-        """
+        """Retrocede para o token anterior."""
         if self.index == 0:
             pass
         else:
@@ -39,37 +51,26 @@ class Parser():
             self.current_token = self.token_list[self.index]
 
     def rollback_to(self, time):
-        """
-            Seta o token para um index especificado
-        """
+        """Seta o token para um index especificado."""
         self.index = time
         self.current_token = self.token_list[self.index]
 
-    def check_eol(self):
-        """
-            Checa se o token atual é None (identificador)
-            de fim de linha e, caso positivo, avança para
-            o próximo token
-        """
-        if self.current_token is None:
-            self.eat()
-
     def parse(self):
-        """
-            Faz a inicialização do parsing
-        """
+        """Faz a inicialização do parsing."""
         while self.do_loop:
             self.treeList.append(self.s())
 
     def solve(self):
-        """
-            Chama iterativamente as funções solve
-        """
+        """Chama iterativamente as funções solve."""
         for i in self.treeList:
             i.solve()
 
-    # Isso aqui é o S dos não terminais
     def s(self):
+        """
+        Representa os não terminais possíveis em uma linha.
+
+        Itera entre todas as possibilidades e devolve o encontrado.
+        """
         func_list = [self.decvar, self.matlab, self.flux, self.rpt,
                      self.control]
 
@@ -81,6 +82,11 @@ class Parser():
         self.error(f"Erro no parser: sentença não reconhecida com {self.current_token[1]}")
 
     def decvar(self):
+        """
+        Implementa a seguinte GLC.
+
+        type var '=' LITERAL eos
+        """
         pace = 0
         index_backup = self.index
         node_list = []
@@ -125,7 +131,11 @@ class Parser():
                               node_list[2])
 
     def literal(self):
-        # str | MATLAB | BOOL | emp
+        """
+        Implementa a seguinte GLC.
+
+        str | MATLAB | BOOL | emp
+        """
         if self.current_token[0] == "str":
             tree_node = sinTree.Str(self.current_token[1])
             self.eat()
@@ -147,7 +157,11 @@ class Parser():
         return None
 
     def bool_ean(self):
-        # BOOL = tru | fls
+        """
+        Implementa a seguinte GLC.
+
+        tru | fls
+        """
         if self.current_token[0] in ("tru", "fls"):
             a = sinTree.Bool(self.current_token[1])
             self.eat()
@@ -156,9 +170,13 @@ class Parser():
             return None
 
     def matlab(self, consume_eos=True):
-        # MATLAB   ->  MATLAB' (+ | -) MATLAB [eos] | MATLAB' [eos]
-        # MATLAB'  ->  MATLAB'' (* | / | ^) (MATLAB' | MATLAB) [eos] | MATLAB''
-        # MATLAB'' ->  num | var | '(' MATLAB ')'
+        """
+        Implementa a seguinte GLC.
+
+        MATLAB' (+ | -) MATLAB [eos] | MATLAB' [eos]
+
+        O parâmetro consume_eos serve como uma análise semântica imbutida.
+        """
         node1 = self.matlab1(consume_eos)
 
         if not node1:
@@ -183,7 +201,14 @@ class Parser():
         return sinTree.BinOp(node1, token[1], node2)
 
     def matlab1(self, consume_eos=True):
-        """MATLAB'  ->  MATLAB'' (* | / | ^) MATLAB'' [eos] | MATLAB''."""
+        """
+        Implementa a seguinte GLC.
+
+        MATLAB'' (* | / | ^) MATLAB'' [eos] | MATLAB''.
+
+        O parâmetro consume_eos serve como uma análise semântica imbutida.
+        É referido como MATLAB'
+        """
         node1 = self.matlab2(consume_eos)
 
         if not node1:
@@ -208,7 +233,14 @@ class Parser():
         return sinTree.BinOp(node1, token[1], node2)
 
     def matlab2(self, consume_eos=True):
-        """MATLAB'' ->  num | var | '(' MATLAB ')'."""
+        """
+        Implementa a seguinte GLC.
+
+        num | var | '(' MATLAB ')'.
+
+        O parâmetro consume_eos serve como uma análise semântica imbutida.
+        É referido como MATLAB''
+        """
         token = self.current_token
 
         if token[0] == "num":
@@ -227,7 +259,12 @@ class Parser():
                 self.error("Erro no parser: faltando )")
 
     def flux(self):
-        # ifi (EXPR) scope_init S scope_end
+        """
+        Implementa as seguintes GLC.
+
+        IFI = ifi (EXPR) scope_init S scope_end
+        ELS = els scope_init S scope_end
+        """
         ifi = self.flux_ifi()
         if ifi is None:
             return None
@@ -243,7 +280,11 @@ class Parser():
             return ifi
 
     def flux_ifi(self):
-        # ifi (EXPR) scope_init S scope_end
+        """
+        Implementa a seguinte GLC.
+
+        ifi (EXPR) scope_init S scope_end
+        """
         checkpoint = self.index
         is_ifi = False
 
@@ -278,7 +319,11 @@ class Parser():
             return None
 
     def flux_els(self):
-        # els scope_init S scope_end
+        """
+        Implementa a seguinte GLC.
+
+        els scope_init S scope_end
+        """
         checkpoint = self.index
         is_els = False
 
@@ -309,9 +354,11 @@ class Parser():
             return None
 
     def expr(self):
-        # EXPR' OPBOOL EXPR' [(and|orr) EXPR] | EXPR'
-        # LITERAL | (EXPR) | ! '(' EXPR ')'
+        """
+        Implementa a seguinte GLC.
 
+        EXPR' OPBOOL EXPR' [(and|orr) EXPR] | EXPR'
+        """
         # EXPR'
         expr1 = self.expr2()
         if expr1 is None:
@@ -353,8 +400,12 @@ class Parser():
             return op2
 
     def expr2(self):
-        # LITERAL | (EXPR) | ! EXPR
+        """
+        Implementa a seguinte GLC.
 
+        LITERAL | (EXPR) | ! EXPR
+        É referido como EXPR'
+        """
         # LITERAL
         a = self.literal()
         if a is not None:
@@ -381,7 +432,9 @@ class Parser():
             if self.current_token[0] == "(":
                 self.eat()
             else:
-                self.error("Erro no parser: operação ! não seguido de parênteses")
+                self.error(
+                    "Erro no parser: operação ! não seguido de parênteses"
+                )
             a = self.expr()
             if a is None:
                 self.rollback_to(checkpoint)
@@ -393,6 +446,11 @@ class Parser():
         return None
 
     def opbool(self):
+        """
+        Implementa a seguinte GLC.
+
+        == | > | >= | < | <=
+        """
         tokens_aceitos = ("==", "!=", ">", ">=", "<", "<=")
         if self.current_token[1] in tokens_aceitos:
             a = sinTree.BinOp(None, self.current_token[1], None)
@@ -402,9 +460,12 @@ class Parser():
             return None
 
     def rpt(self):
-        # whl (EXPR) scope_init S scope_end
-        # for [type] var '=' RANGE scope_init S scope_end
+        """
+        Implementa as seguintes GLCs.
 
+        WHL = whl (EXPR) scope_init S scope_end
+        FOR = for [type] var '=' RANGE scope_init S scope_end
+        """
         # whl (EXPR) scope_init S scope_end
         a = self.rpt_whl()
         if a is not None:
@@ -417,6 +478,11 @@ class Parser():
         return None
 
     def rpt_whl(self):
+        """
+        Implementa a seguinte GLC.
+
+        whl (EXPR) scope_init S scope_end
+        """
         # whl (EXPR) scope_init S scope_end
         checkpoint = self.index
         is_whl = False
@@ -452,6 +518,11 @@ class Parser():
             return None
 
     def rpt_for(self):
+        """
+        Implementa a seguinte GLC.
+
+        for [type] var '=' RANGE scope_init S scope_end
+        """
         # for [type] var '=' RANGE scope_init S scope_end
         checkpoint = self.index
         is_for = False
@@ -503,8 +574,11 @@ class Parser():
             return None
 
     def ranger(self):
-        # num : num
+        """
+        Implementa a seguinte GLC.
 
+        num : num
+        """
         # num
         if self.current_token[0] == "num":
             num1 = sinTree.Num(self.current_token[1])
@@ -530,7 +604,11 @@ class Parser():
             return None
 
     def control(self):
-        # brk | jmp | emp
+        """
+        Implementa a seguinte GLC.
+
+        brk | jmp | emp
+        """
         if self.current_token[0] == "brk":
             token = "brk"
             self.eat()
