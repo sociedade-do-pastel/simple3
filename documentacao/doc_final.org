@@ -41,7 +41,6 @@ exemplo abaixo:
 | =brk=       | "brk"             |                              |
 | =jmp=       | "jmp"             |                              |
 | {...}     | "\ {" e "\ }"     | definição de escopo          |
-| \([...]\) | "\ [" e "\ ]"     | acesso ou definição de vetor |
 | (...)     | "\ (" e "\ )"     |                              |
 | =emp=       | "emp"             | *nil* ou *null*                  |
 | =tru=       | "tru"             |                              |
@@ -94,11 +93,11 @@ Em todos os sistemas operacionais, a linguagem é dependente do interpretador da
 : ./simple3 arquivo_entrada <nome_saida_opcional>
 
 
-Caso não seja suprimido um nome para o arquivo de saída, este se baseará no /filename/ do arquivo de entrada. Outras possibilidades :
+Caso não seja fornecido um nome para o arquivo de saída, este se baseará no /filename/ do arquivo de entrada. Outras possibilidades :
 
 - Arquivo de saída sem ".py" :: Será incluído o sufixo ".py" no /filename/ desejado, exemplo: =./simple3 foo => foo.py=;
 
-- Arquivo de saída não suprimido :: O compilador produzirá um erro sem produzir um arquivo de saída compilado;
+- Arquivo de entrada não fornecido :: O compilador produzirá um erro sem produzir um arquivo de saída compilado;
 
 
 Se a execução do /shell script/ falhar, é possível invocar o compilador diretamente através do comando:
@@ -246,7 +245,7 @@ while EXPRESSION:
     ... 
 #+end_example
 
-Além disso,  equipe *modificou* o método =solve= criado durante uma fase de desenvolvimento anterior, para que este funcione de forma semelhante ao padrão *visitor*, implementando tratamentos apropriados para a linguagem a qual a compilação acontecerá para. Note que algumas checagens já ocorrem como no exemplo a seguir:
+Além disso,  equipe *modificou* o método =solve= criado durante uma fase de desenvolvimento anterior, para que este funcione de forma semelhante ao padrão *visitor*, implementando tratamentos apropriados para a linguagem alvo. Note que algumas checagens já ocorrem como mostra o exemplo a seguir:
 
 #+begin_src python
 def __str__(self):

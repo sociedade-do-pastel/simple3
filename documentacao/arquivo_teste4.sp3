@@ -17,7 +17,7 @@ ifi (age < 20 ) {
 } els {
     ifi (age < 41) {
       str out = "Life is young, at least for you";
-      } els {
-        str out = "Ok boomer";
-      }
+    } els {
+      str out = "Ok boomer";
+    }
 }
